@@ -12,8 +12,8 @@ EXECS = $(33sh) $(33noprompt)
 .PHONY: all clean
 all: $(EXECS)
 33sh: $(EXECS)
-	$(CC) $(CFLAGS) -o -DPROMPT 33sh
+	$(CC) $(CFLAGS) -o PROMPT $(33sh)
 33noprompt: $(EXECS)
-	$(CC) $(CFLAGS) -o 33noprompt
+	$(CC) $(CFLAGS) -o $(33noprompt)
 clean:
 	rm -f $(EXECS)
