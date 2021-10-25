@@ -10,9 +10,9 @@ EXECS = 33sh 33noprompt
 
 .PHONY: all clean
 all: $(EXECS)
-33sh: $(EXECS)
+33sh: $(OBJS)
 	$(CC) $(CFLAGS) -o PROMPT $(OBJS)
-33noprompt: $(EXECS)
+33noprompt: $(OBJS)
 	$(CC) $(CFLAGS) -o $(OBJS)
 clean:
 	rm -f $(EXECS)
