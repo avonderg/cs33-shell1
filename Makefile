@@ -3,11 +3,16 @@ CFLAGS += -Winline -Wfloat-equal -Wnested-externs
 CFLAGS += -pedantic -std=gnu99 -Werror
 
 PROMPT = -DPROMPT
+# variable declarations
+CC = gcc
+MAIN = sh.c
+EXECS = 33sh 33noprompt
 
-33sh:
-	#TODO: compile your program, including the -DPROMPT macro
-33noprompt:
-	#TODO: compile your program without the prompt macro
+.PHONY: all clean
+all: $(EXECS)
+33sh: $(MAIN)
+	$(CC) $(CFLAGS) -o -DPROMPT 33sh
+33noprompt: $(MAIN)
+	$(CC) $(CFLAGS) -o 33noprompt
 clean:
-	#TODO: clean up any executable files that this Makefile has produced
-
+	rm -f $(EXECS)
