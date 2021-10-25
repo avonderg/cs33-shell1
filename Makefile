@@ -5,15 +5,14 @@ CFLAGS += -pedantic -std=gnu99 -Werror
 PROMPT = -DPROMPT
 # variable declarations
 CC = gcc
-33sh = sh.c
-33noprompt = sh.c
-EXECS = $(33sh) $(33noprompt)
+OBJS = sh.c
+EXECS = 33sh 33noprompt
 
 .PHONY: all clean
 all: $(EXECS)
 33sh: $(EXECS)
-	$(CC) $(CFLAGS) -o PROMPT $(33sh)
+	$(CC) $(CFLAGS) -o PROMPT $(OBJS)
 33noprompt: $(EXECS)
-	$(CC) $(CFLAGS) -o $(33noprompt)
+	$(CC) $(CFLAGS) -o $(OBJS)
 clean:
 	rm -f $(EXECS)
