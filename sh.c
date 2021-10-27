@@ -117,7 +117,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             fprintf(stderr, "No redirection file specified.");
             return 0;
             }
-            if (tokens[i+1] == '>>') {
+            if (tokens[i+1] == '>>') { // do i have to dereference?
             fprintf(stderr, "No redirection file specified.");
             return 0;
             }
@@ -188,7 +188,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
 //write descr
 // returns -1 if error, 1 if no dir given, 0 if successful
 int built_in(char *argv[512]) {
-    if (strcmp(argv[0], 'cd') ==0) { // if the command is cd
+    if (strcmp(argv[0], "cd") ==0) { // if the command is cd
         char *dir = argv[1];
         if (dir == NULL) {
             cd(getenv("HOME")); // go to home directory if no path given
@@ -200,7 +200,7 @@ int built_in(char *argv[512]) {
             return -1;
         }
     }
-    else if (strcmp(argv[0], 'ln') ==0) { // if the command is ln
+    else if (strcmp(argv[0], "ln") ==0) { // if the command is ln
         char *src = argv[1];
         char *dest = argv[2];
         int ln_res = ln(src,dest); // pass in args 1,2
@@ -209,7 +209,7 @@ int built_in(char *argv[512]) {
             return -1;
         }
     }
-    else if (strcmp(argv[0], 'rm') ==0) { // if the command is rm
+    else if (strcmp(argv[0], "rm") ==0) { // if the command is rm
         char *file = argv[1];
         int rm_res = rm(file); // pass in arg1
         if (rm_res != 0) { // error checking
