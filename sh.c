@@ -4,6 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// function declarations
+void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]);
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char *inputs[512], char *outputs[512]);
+int built_in(char *argv[512]);
+int cd(char *dir);
+int ln(char *src, char *dest);
+int rm(char *file);
+
+
 int main() {
     //repl (read eval print loop)
     while (1) {
@@ -86,12 +95,12 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
     int k = 0; // index for argv array
     int flag1 = 0;
     int flag2 = 0;
-    const char r1[2] = {' ','\t'}; // characters to tokenize
+    char r1[2] = {' ','\t'}; // characters to tokenize
     parse_helper(buffer,tokens,w_sym,r1);
     while (tokens[i] != NULL) {
         // check redirect followed by a token
         // no redirect file
-        if (strcmp(tokens[i],'<') == 0) {
+        if (strcmp(tokens[i],"<") == 0) {
             // error check first
             flag1++; // set flag to 1- meaning that it was found
             if (flag1 >1) { // if input redirect appeared 2x
@@ -117,7 +126,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             inputs[j+1] = tokens[i+1]; // followed by filename
             j++;
         }
-        else if (strcmp(tokens[i],'>') == 0) { 
+        else if (strcmp(tokens[i],">") == 0) { 
             // error check first
             flag2++; // set flag to 1- meaning that it was found
             if (flag2 >1) { // if output redirect appeared 2x
@@ -133,7 +142,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             outputs[j+1] = tokens[i+1]; // followed by filename
             j++;
         }
-        else if (strcmp(tokens[i],'>>') == 0) {
+        else if (strcmp(tokens[i],">>") == 0) {
             // error check first
             flag2++; // set flag to 1- meaning that it was found
             if (flag2 >1) { // if output redirect appeared 2x
