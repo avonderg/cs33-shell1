@@ -1,5 +1,8 @@
 #include <stddef.h>
 #include <string.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 int main() {
     //repl (read eval print loop)
@@ -26,14 +29,11 @@ int main() {
     char *w_sym[512];
     char *inputs[512];
     char *outputs[512];
-    int result = parse(buf,tokens,argv, w_sym,inputs,outputs);
-    if (result == 0) {
+    int parse_result = parse(buf,tokens,argv, w_sym,inputs,outputs);
+    if (parse_result == 0) {
         continue;
     }
-    // first elt in = command
-
-
-
+    int built_ins = built_in(argv);
     }
    return 0;
 }
@@ -95,21 +95,21 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             // error check first
             flag1++; // set flag to 1- meaning that it was found
             if (flag1 >1) { // if input redirect appeared 2x
-            fprintf("Can’t have two input redirects on one line.");
+            fprintf(stderr, "Can’t have two input redirects on one line.");
             return 0; 
             }
             if (tokens[i+1] == NULL) {
-            fprintf("No redirection file specified.");
+            fprintf(stderr, "No redirection file specified.");
             return 0;
             // return a value showing it succeeded 
             // continue;
             }
             if (tokens[i+1] == '>') {
-            fprintf("No redirection file specified.");
+            fprintf(stderr, "No redirection file specified.");
             return 0;
             }
             if (tokens[i+1] == '>>') {
-            fprintf("No redirection file specified.");
+            fprintf(stderr, "No redirection file specified.");
             return 0;
             }
             // after error checking is complete
@@ -121,11 +121,11 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             // error check first
             flag2++; // set flag to 1- meaning that it was found
             if (flag2 >1) { // if output redirect appeared 2x
-            fprintf("Can’t have two output redirects on one line.");
+            fprintf(stderr, "Can’t have two output redirects on one line.");
             return 0;
             }
             if (tokens[i+1] == NULL) {
-            fprintf("No redirection file specified.");
+            fprintf(stderr, "No redirection file specified.");
             return 0;
             }
             // after error checking is complete
@@ -137,11 +137,11 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             // error check first
             flag2++; // set flag to 1- meaning that it was found
             if (flag2 >1) { // if output redirect appeared 2x
-            fprintf("Can’t have two output redirects on one line.");
+            fprintf(stderr, "Can’t have two output redirects on one line.");
             return 0;
             }
             if (tokens[i+1] == NULL) {
-            fprintf("No redirection file specified.");
+            fprintf(stderr, "No redirection file specified.");
             return 0;
             }
             // after error checking is complete
@@ -155,7 +155,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
         }
         i++;
     }
-
+// check whether you have mult of teh same input/output redirection
 
 
     // go through tokens array and redirectit
@@ -176,7 +176,55 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
     return 1;
 }
 
+//write descr
+// returns -1 if error, 1 if no dir given, 0 if successful
+int built_in(char *argv[512]) {
+    if (strcmp(argv[0], 'cd') ==0) { // if the command is cd
+        char *dir = argv[1];
+        if (dir == NULL) {
+            cd(getenv("HOME")); // go to home directory if no path given
+            return 1;
+        }
+        int cd_res = cd(dir); // pass in elt after 'cd'
+        if (cd_res<0) { // error checking
+            perror("no such directory");
+            return -1;
+        }
+    }
+    else if (strcmp(argv[0], 'ln') ==0) { // if the command is ln
+        char *src = argv[1];
+        char *dest = argv[2];
+        int ln_res = ln(src,dest); // pass in args 1,2
+        if (ln_res != 0) { // error checking
+            perror("failed to link");
+            return -1;
+        }
+    }
+    else if (strcmp(argv[0], 'rm') ==0) { // if the command is rm
+        char *file = argv[1];
+        int rm_res = rm(file); // pass in arg1
+        if (rm_res != 0) { // error checking
+            perror("unable to delete the file");
+            return -1;
+        }
+    }
+    else if (strcmp(argv[0], 'exit') ==0) { // if the command is exit
+        exit(0);
+    }
+    return 0;
+}
 
-void built_in() {
-    ch
+// given a pointer to the input directory, changes the current working directory 
+int cd(char *dir) {
+    return chdir(dir); // returns 0 if change of directory was successful, -1 otherwise
+}
+
+// given a source and destination, makes a hard link to a file
+int ln(char *src, char *dest) {
+   return link(src,dest);
+}
+
+// removes given input file from a directory using a pointer to the file
+int rm(char *file) {
+    return remove(file);
 }
