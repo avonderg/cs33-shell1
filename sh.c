@@ -43,6 +43,9 @@ int main() {
         continue;
     }
     int built_ins = built_in(argv);
+    if (built_ins != 0) {
+        continue;
+    }
     }
    return 0;
 }
