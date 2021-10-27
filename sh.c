@@ -113,14 +113,12 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             if (tokens[i+1] == NULL) {
             fprintf(stderr, "No redirection file specified.");
             return 0;
-            // return a value showing it succeeded 
-            // continue;
             }
             if (tokens[i+1] == '>') {
             fprintf(stderr, "No redirection file specified.");
             return 0;
             }
-            if (tokens[i+1] == '>>') { // do i have to dereference?
+            if (strcmp(tokens[i+1],">>") == 0) { 
             fprintf(stderr, "No redirection file specified.");
             return 0;
             }
