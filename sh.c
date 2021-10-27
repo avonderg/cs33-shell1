@@ -217,7 +217,7 @@ int built_in(char *argv[512]) {
             return -1;
         }
     }
-    else if (strcmp(argv[0], 'exit') ==0) { // if the command is exit
+    else if (strcmp(argv[0], "exit") ==0) { // if the command is exit
         exit(0);
     }
     return 0;
