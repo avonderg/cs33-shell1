@@ -18,10 +18,9 @@ int main() {
     while (1) {
     // initializing
     char *buf[1024];
-    int n;
     int fd = STDIN_FILENO;
     size_t count = 1024;
-    int to_read;
+    size_t to_read;
     // reading system call to get user input
     to_read = read(fd, buf, count);
     // error-checking
