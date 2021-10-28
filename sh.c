@@ -7,13 +7,13 @@
 #include <fcntl.h>
 
 // function declarations
-void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]);
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char input_file[30], char output_file[30], int output_flags);
+void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20], char path[30]);
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, char path[30]);
 int built_in(char *argv[512]);
 int cd(char *dir);
 int ln(char *src, char *dest);
 int rm(char *file);
-int file_redirect(char buffer[1024], int input_index, int output_index, char input_file[30], char output_file[30], int output_files);
+int file_redirect(char buffer[1024], char input_file[30], char output_file[30], int output_files);
 
 // close stdin
 // open given file
@@ -39,11 +39,12 @@ int main() {
     #ifdef PROMPT 
     if (printf("33sh> ") < 0) { 
         fprintf(stderr, "error: unable to write");
+        return 1;
     }
     if (fflush(stdout) < 0) {
         perror("fflush");
+        return 1; // only return zero when it works!
     }
-
     #endif
 
     // initializing
@@ -56,21 +57,22 @@ int main() {
     // error-checking
     if (to_read == -1) { 
         perror("error: read");
-        return 0;
+        return 1;
     }
-    else if (to_read == 0) { // if they hit return, end program / restart
+    else if (to_read == 0) { // end program / restart
         return 0;
     }
     buf[to_read] = '\0'; // since the read function does not null-terminate the buffer
     char *tokens[512];
     char *argv[512];
     char *w_sym[512];
-    int input_index;
-    int output_index;
+    // int input_index;
+    // int output_index;
+    char *path[30];
     char *input_file[30];
     char *output_file[30];
     int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
-    int parse_result = parse(*buf,tokens,argv,w_sym,input_index,output_index, *input_file, *output_file, output_flags);
+    int parse_result = parse(*buf,tokens,argv,w_sym, *input_file, *output_file, output_flags, *path);
     if (parse_result == 0) {
         continue;
     }
@@ -78,15 +80,17 @@ int main() {
     if (built_ins != 0) {
         continue; // dont fork or execv, would fail automaticallly and exit out
     }
-    int redirects = file_redirect(*buf, input_index, output_index, *input_file, *output_file, output_flags);
+    int redirects = file_redirect(*buf, *input_file, *output_file, output_flags);
     if (redirects == -1) { // if an error has occured
         continue; 
     }
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
-        execv(tokens[0], argv); //argv[0] is the file path
+        int exec = execv(path, argv);
+        if (exec == -1) {
+            perror("execv");
+        }
         perror("child process could not do execv");
-        exit(1);  // is this line necessary
     }
     else if ((pid = fork()) != -1) { // enters wait mode
         wait(NULL);
@@ -99,7 +103,7 @@ int main() {
 }
 
 // write descr
-void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]) {
+void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20], char path[30]) {
     char *temp; // temp string to hold values
     int n = 0;
     temp = strtok(buffer, r); // tokenizes temp char, only returns first token
@@ -109,6 +113,7 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
         n++;
     }
     char *first = strtok(buffer, r); // gets first token (binary name)
+    path = first; // sets path equal to the first token
       if (first == NULL) { // base case
         argv[0]= NULL;
       }
@@ -125,12 +130,11 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
           }
       else {
         argv[0]= last; //otherwise, set first argument equal to the following one
+
       }
       }
       int index = 1;
       while (tokens[index]!= NULL) { // looping through tokens string
-
-
         argv[index] = tokens[index]; // sets arguments equal to the appropriate tokens
         index++; // increments index
         }
@@ -140,7 +144,7 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
 
 // write descr
 // returns 0 if it failed, 1 otherwise
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char input_file[30], char output_file[30], int output_flags) {
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, char path[30]) {
     int i = 0; // index for tokens
     int k = 0; // index for argv array
     int flag1 = 0;
@@ -148,7 +152,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
     char r1[2] = {' ','\t'}; // characters to tokenize
     input_file = "\0";
     output_file = "\0";
-    parse_helper(buffer,tokens,w_sym,r1);
+    parse_helper(buffer,tokens,w_sym,r1, path);
     while (tokens[i] != NULL) {
         // check redirect followed by a token
         // no redirect file
@@ -172,7 +176,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
                 return 0;
             }
             // after error checking is complete
-            input_index = i;
+            // input_index = i;
             input_file = tokens[i+1];
         }
         else if (strcmp(tokens[i],">") == 0) { 
@@ -188,7 +192,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             return 0;
             }
             // after error checking is complete
-            output_index = i;
+            // output_index = i;
             output_file = tokens[i+1];
         }
         else if (strcmp(tokens[i],">>") == 0) {
@@ -204,7 +208,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             return 0;
             }
             // after error checking is complete
-            output_index = i;
+            // output_index = i;
             output_file = tokens[i+1];
         }
         else {  // otherwise, then add in element to argv
@@ -236,7 +240,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
 
 // write descr
 // returns -1 if an error occured, 0 otherwise
-int file_redirect(char buffer[1024], int input_index, int output_index, char input_file[30], char output_file[30], int output_flags) {
+int file_redirect(char buffer[1024], char input_file[30], char output_file[30], int output_flags) {
     int closed = close(STDIN_FILENO);
     if (closed != 0) {
         perror("error: close");
