@@ -36,6 +36,27 @@ int file_redirect(char buffer[1024], int input_index, int output_index, char inp
 int main() {
     //repl (read eval print loop)
     while (1) {
+    #ifdef PROMPT 
+    printf("33sh> ");
+    fflush(stdout);
+    if (printf("33sh> ") < 0) { 
+        fprintf(stderr, "error: unable to write");
+    }
+    if (fflush(stdout) < 0) {
+        fprintf(stderr, "output error");
+    } 
+    #endif
+    #ifndef PROMPT 
+    printf("33noprompt> ");
+    fflush(stdout);
+    if (printf("33noprompt> ") < 0) { 
+        fprintf(stderr, "error: unable to write");
+    }
+    if (fflush(stdout) < 0) {
+        fprintf(stderr, "output error");
+    } 
+    #endif
+
     // initializing
     char *buf[1024];
     int fd = STDIN_FILENO;
@@ -74,8 +95,9 @@ int main() {
     }
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
-        execv(argv[0], argv); //argv[0] is the file path
+        execv(tokens[0], argv); //argv[0] is the file path
         perror("child process could not do execv");
+        exit(1);  // is this line necessary
     }
     else if ((pid = fork()) != -1) { // enters wait mode
         wait(NULL);
