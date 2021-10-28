@@ -7,8 +7,8 @@
 #include <fcntl.h>
 
 // function declarations
-void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20], char path[30]);
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, char path[30]);
+void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20], const char path[30]);
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, const char path[30]);
 int built_in(char *argv[512]);
 int cd(char *dir);
 int ln(char *src, char *dest);
@@ -103,7 +103,7 @@ int main() {
 }
 
 // write descr
-void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20], char path[30]) {
+void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20], const char path[30]) {
     char *temp; // temp string to hold values
     int n = 0;
     temp = strtok(buffer, r); // tokenizes temp char, only returns first token
@@ -144,7 +144,7 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
 
 // write descr
 // returns 0 if it failed, 1 otherwise
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, char path[30]) {
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, const char path[30]) {
     int i = 0; // index for tokens
     int k = 0; // index for argv array
     int flag1 = 0;
