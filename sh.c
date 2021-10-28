@@ -56,7 +56,7 @@ int main() {
 void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]) {
     char *temp; // temp string to hold values
     int n = 0;
-    temp = strtok(*buffer, r); // tokenizes temp char, only returns first token
+    temp = strtok(buffer, r); // tokenizes temp char, only returns first token
     while (temp !=NULL) { // loop through the temp string in order to find all tokens
         tokens[n] = temp; // value stored in tokens array
         temp = strtok(NULL,r); // goes to next character in string that is not whitespace
@@ -96,7 +96,6 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
 // returns 0 if it failed, 1 otherwise
 int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char input_file, char output_file) {
     int i = 0; // index for tokens
-    int j =0; // index for input/output arrays
     int k = 0; // index for argv array
     int flag1 = 0;
     int flag2 = 0;
@@ -109,20 +108,20 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             // error check first
             flag1++; // set flag to 1- meaning that it was found
             if (flag1 >1) { // if input redirect appeared 2x
-            fprintf(stderr, "Can’t have two input redirects on one line.");
-            return 0; 
+                fprintf(stderr, "Can’t have two input redirects on one line.");
+                return 0; 
             }
-            if (tokens[i+1] == NULL) {
-            fprintf(stderr, "No redirection file specified.");
-            return 0;
+            if (*tokens[i+1] == NULL) {
+                fprintf(stderr, "No redirection file specified.");
+                return 0;
             }
-            if (tokens[i+1] == '>') {
-            fprintf(stderr, "No redirection file specified.");
-            return 0;
+            if (strcmp(tokens[i+1],">") == 0) {
+                fprintf(stderr, "No redirection file specified.");
+                return 0;
             }
             if (strcmp(tokens[i+1],">>") == 0) { 
-            fprintf(stderr, "No redirection file specified.");
-            return 0;
+                fprintf(stderr, "No redirection file specified.");
+                return 0;
             }
             // after error checking is complete
             input_index = i;
