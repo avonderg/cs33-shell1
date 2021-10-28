@@ -6,7 +6,7 @@
 
 // function declarations
 void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]);
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char *inputs[512], char *outputs[512]);
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char input_file, char output_file);
 int built_in(char *argv[512]);
 int cd(char *dir);
 int ln(char *src, char *dest);
@@ -35,13 +35,11 @@ int main() {
     char *tokens[512];
     char *argv[512];
     char *w_sym[512];
-    char *inputs[512];
-    char *outputs[512];
     int input_index;
     int output_index;
     char input_file;
     char output_file;
-    int parse_result = parse(buf,tokens,argv, w_sym,inputs,outputs);
+    int parse_result = parse(buf,tokens,argv,w_sym,input_index,output_index, input_file, output_file);
     if (parse_result == 0) {
         continue;
     }
@@ -96,7 +94,7 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
 
 // write descr
 // returns 0 if it failed, 1 otherwise
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char *inputs[512], char *outputs[512]) {
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char input_file, char output_file) {
     int i = 0; // index for tokens
     int j =0; // index for input/output arrays
     int k = 0; // index for argv array
@@ -127,10 +125,8 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             return 0;
             }
             // after error checking is complete
-            inputs[j] = i; // inputs index of the redirect
-            
-            inputs[j+1] = tokens[i+1]; // followed by filename
-            j++;
+            input_index = i;
+            input_file = tokens[i+1];
         }
         else if (strcmp(tokens[i],">") == 0) { 
             // error check first
@@ -144,9 +140,8 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             return 0;
             }
             // after error checking is complete
-            outputs[j] = i; // inputs index of the redirect
-            outputs[j+1] = tokens[i+1]; // followed by filename
-            j++;
+            output_index = i;
+            output_file = tokens[i+1];
         }
         else if (strcmp(tokens[i],">>") == 0) {
             // error check first
@@ -160,9 +155,8 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             return 0;
             }
             // after error checking is complete
-            outputs[j] = i; // inputs index of the redirect
-            outputs[j+1] = tokens[i+1]; // followed by filename]
-            j++;
+            output_index = i;
+            output_file = tokens[i+1];
         }
         else {  // otherwise, then add in element to argv
             argv[k] = w_sym[i];
