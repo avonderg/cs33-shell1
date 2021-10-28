@@ -11,7 +11,7 @@ EXECS = 33sh 33noprompt
 .PHONY: all clean
 all: $(EXECS)
 33sh: $(OBJS)
-	$(CC) $(CFLAGS) -o 33sh PROMPT $(OBJS)
+	$(CC) $(CFLAGS) -o 33sh $(PROMPT) $(OBJS)
 33noprompt: $(OBJS)
 	$(CC) $(CFLAGS) -o 33noprompt $(OBJS)
 clean:
