@@ -17,9 +17,9 @@ int main() {
     //repl (read eval print loop)
     while (1) {
     // initializing
-    char buf[1024];
+    char *buf[1024];
     int n;
-    int fd = stdin;
+    int fd = STDIN_FILENO;
     size_t count = 1024;
     int to_read;
     // reading system call to get user input
