@@ -19,8 +19,8 @@ int main() {
     // initializing
     char buf[1024];
     int n;
-    int fd;
-    size_t count;
+    int fd = stdin;
+    size_t count = 1024;
     int to_read;
     // reading system call to get user input
     to_read = read(fd, buf, count);
@@ -32,12 +32,16 @@ int main() {
     else if (to_read == 0) { // if they hit return, end program / restart
         return 0;
     }
-    buf[to_read] = NULL; // since the read function does not null-terminate the buffer
+    buf[to_read] = '\0'; // since the read function does not null-terminate the buffer
     char *tokens[512];
     char *argv[512];
     char *w_sym[512];
     char *inputs[512];
     char *outputs[512];
+    int input_index;
+    int output_index;
+    char input_file;
+    char output_file;
     int parse_result = parse(buf,tokens,argv, w_sym,inputs,outputs);
     if (parse_result == 0) {
         continue;
@@ -48,6 +52,7 @@ int main() {
     }
     }
    return 0;
+
 }
 
 // write descr
@@ -124,6 +129,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             }
             // after error checking is complete
             inputs[j] = i; // inputs index of the redirect
+            
             inputs[j+1] = tokens[i+1]; // followed by filename
             j++;
         }
