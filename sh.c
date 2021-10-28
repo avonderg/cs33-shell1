@@ -39,7 +39,7 @@ int main() {
     int output_index;
     char input_file;
     char output_file;
-    int parse_result = parse(buf,tokens,argv,w_sym,input_index,output_index, input_file, output_file);
+    int parse_result = parse(*buf,tokens,argv,w_sym,input_index,output_index, input_file, output_file);
     if (parse_result == 0) {
         continue;
     }
@@ -56,7 +56,7 @@ int main() {
 void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]) {
     char *temp; // temp string to hold values
     int n = 0;
-    temp = strtok(buffer, r); // tokenizes temp char, only returns first token
+    temp = strtok(*buffer, r); // tokenizes temp char, only returns first token
     while (temp !=NULL) { // loop through the temp string in order to find all tokens
         tokens[n] = temp; // value stored in tokens array
         temp = strtok(NULL,r); // goes to next character in string that is not whitespace
