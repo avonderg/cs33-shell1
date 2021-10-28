@@ -37,24 +37,13 @@ int main() {
     //repl (read eval print loop)
     while (1) {
     #ifdef PROMPT 
-    printf("33sh> ");
-    fflush(stdout);
     if (printf("33sh> ") < 0) { 
         fprintf(stderr, "error: unable to write");
     }
     if (fflush(stdout) < 0) {
-        fprintf(stderr, "output error");
-    } 
-    #endif
-    #ifndef PROMPT 
-    printf("33noprompt> ");
-    fflush(stdout);
-    if (printf("33noprompt> ") < 0) { 
-        fprintf(stderr, "error: unable to write");
+        perror("fflush");
     }
-    if (fflush(stdout) < 0) {
-        fprintf(stderr, "output error");
-    } 
+
     #endif
 
     // initializing
