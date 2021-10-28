@@ -19,7 +19,7 @@ int main() {
     // initializing
     char *buf[1024];
     int fd = STDIN_FILENO;
-    ssize_t count = 1024;
+    size_t count = 1024;
     ssize_t to_read;
     // reading system call to get user input
     to_read = read(fd, buf, count);
