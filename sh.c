@@ -111,7 +111,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
                 fprintf(stderr, "Can’t have two input redirects on one line.");
                 return 0; 
             }
-            if (*tokens[i+1] == NULL) {
+            if (tokens[i+1] == NULL) {
                 fprintf(stderr, "No redirection file specified.");
                 return 0;
             }
@@ -125,7 +125,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             }
             // after error checking is complete
             input_index = i;
-            input_file = tokens[i+1];
+            input_file = *tokens[i+1];
         }
         else if (strcmp(tokens[i],">") == 0) { 
             // error check first
@@ -140,7 +140,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             }
             // after error checking is complete
             output_index = i;
-            output_file = tokens[i+1];
+            output_file = *tokens[i+1];
         }
         else if (strcmp(tokens[i],">>") == 0) {
             // error check first
@@ -155,7 +155,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             }
             // after error checking is complete
             output_index = i;
-            output_file = tokens[i+1];
+            output_file = *tokens[i+1];
         }
         else {  // otherwise, then add in element to argv
             argv[k] = w_sym[i];
