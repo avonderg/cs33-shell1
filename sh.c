@@ -8,12 +8,12 @@
 
 // function declarations
 void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]);
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char *input_file[30], char *output_file[30], int output_flags);
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char input_file[30], char output_file[30], int output_flags);
 int built_in(char *argv[512]);
 int cd(char *dir);
 int ln(char *src, char *dest);
 int rm(char *file);
-int file_redirect(char *buffer[1024], int input_index, int output_index, char *input_file[30], char *output_file[30], int output_files);
+int file_redirect(char buffer[1024], int input_index, int output_index, char input_file[30], char output_file[30], int output_files);
 
 // close stdin
 // open given file
@@ -68,7 +68,7 @@ int main() {
     if (built_ins != 0) {
         continue; // dont fork or execv, would fail automaticallly and exit out
     }
-    int redirects = file_redirect(buf, input_index, output_index, input_file, output_file, output_flags);
+    int redirects = file_redirect(*buf, input_index, output_index, *input_file, *output_file, output_flags);
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
         execv(argv[0], argv); //argv[0] is the file path
@@ -126,7 +126,7 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
 
 // write descr
 // returns 0 if it failed, 1 otherwise
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char *input_file[30], char *output_file[30], int output_flags) {
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char input_file[30], char output_file[30], int output_flags) {
     int i = 0; // index for tokens
     int k = 0; // index for argv array
     int flag1 = 0;
@@ -222,7 +222,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
 
 // write descr
 // returns -1 if an error occured, 0 otherwise
-int file_redirect(char *buffer[1024], int input_index, int output_index, char *input_file[30], char *output_file[30], int output_flags) {
+int file_redirect(char buffer[1024], int input_index, int output_index, char input_file[30], char output_file[30], int output_flags) {
     int closed = close(STDIN_FILENO);
     if (closed != 0) {
         perror("error: close");
