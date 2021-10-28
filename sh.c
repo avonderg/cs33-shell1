@@ -68,7 +68,7 @@ int main() {
     char *w_sym[512];
     // int input_index;
     // int output_index;
-    char *path[30];
+    const char *path[30];
     char *input_file[30];
     char *output_file[30];
     int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
@@ -86,7 +86,7 @@ int main() {
     }
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
-        int exec = execv(path, argv);
+        int exec = execv(*path, argv);
         if (exec == -1) {
             perror("execv");
         }
