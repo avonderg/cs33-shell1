@@ -69,6 +69,9 @@ int main() {
         continue; // dont fork or execv, would fail automaticallly and exit out
     }
     int redirects = file_redirect(*buf, input_index, output_index, *input_file, *output_file, output_flags);
+    if (redirects == -1) { // if an error has occured
+        continue; 
+    }
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
         execv(argv[0], argv); //argv[0] is the file path
@@ -159,7 +162,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             }
             // after error checking is complete
             input_index = i;
-            input_file = *tokens[i+1];
+            input_file = tokens[i+1];
         }
         else if (strcmp(tokens[i],">") == 0) { 
             // error check first
@@ -175,7 +178,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             }
             // after error checking is complete
             output_index = i;
-            output_file = *tokens[i+1];
+            output_file = tokens[i+1];
         }
         else if (strcmp(tokens[i],">>") == 0) {
             // error check first
@@ -191,7 +194,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             }
             // after error checking is complete
             output_index = i;
-            output_file = *tokens[i+1];
+            output_file = tokens[i+1];
         }
         else {  // otherwise, then add in element to argv
             argv[k] = w_sym[i];
@@ -234,7 +237,7 @@ int file_redirect(char buffer[1024], int input_index, int output_index, char inp
             perror("error: open");
             return -1;
         }
-        int read_descr = read(open_descr, buffer, 1024);
+        ssize_t read_descr = read(open_descr, buffer, 1024);
         if (read_descr == -1) {
             perror("error: read");
             return -1;
@@ -248,7 +251,7 @@ int file_redirect(char buffer[1024], int input_index, int output_index, char inp
             perror("error: open");
             return -1;
         }
-        int write_descr = write(open_descr, buffer, 1024);
+        ssize_t write_descr = write(open_descr, buffer, 1024);
         if (write_descr == -1) {
             perror("error: read");
             return -1;
@@ -260,7 +263,7 @@ int file_redirect(char buffer[1024], int input_index, int output_index, char inp
             perror("error: open");
             return -1;
         }
-        int write_descr = write(open_descr, buffer, 1024);
+        ssize_t write_descr = write(open_descr, buffer, 1024);
         if (write_descr == -1) {
             perror("error: read");
             return -1;
