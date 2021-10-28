@@ -3,16 +3,36 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 
 // function declarations
 void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]);
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char input_file, char output_file);
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char *input_file[30], char *output_file[30], int output_flags);
 int built_in(char *argv[512]);
 int cd(char *dir);
 int ln(char *src, char *dest);
 int rm(char *file);
+int file_redirect(char *buffer[1024], int input_index, int output_index, char *input_file[30], char *output_file[30], int output_files);
 
-
+// close stdin
+// open given file
+// if no input/output file
+// after that you close stdin
+// open , if its an input, that file using read only
+// need to be able to READ it to allow execv
+// if its a write file (output)
+// depending on which output, set the flags one way
+//o append o trunc
+// set the flags
+// open thouse
+// open files AFTER you run fork
+// between running fork and execv
+// fork into child and open child so child can run commands
+// call parse in the main (parent)
+// in the child is where you read/write
+// execv is going to take in argv array and pointers to input file and output file
+// in parse set a tracker whether you are appending or truncating
 int main() {
     //repl (read eval print loop)
     while (1) {
@@ -25,7 +45,7 @@ int main() {
     to_read = read(fd, buf, count);
     // error-checking
     if (to_read == -1) { 
-        perror("read");
+        perror("error: read");
         return 0;
     }
     else if (to_read == 0) { // if they hit return, end program / restart
@@ -37,19 +57,31 @@ int main() {
     char *w_sym[512];
     int input_index;
     int output_index;
-    char input_file;
-    char output_file;
-    int parse_result = parse(*buf,tokens,argv,w_sym,input_index,output_index, input_file, output_file);
+    char *input_file[30];
+    char *output_file[30];
+    int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
+    int parse_result = parse(*buf,tokens,argv,w_sym,input_index,output_index, *input_file, *output_file, output_flags);
     if (parse_result == 0) {
         continue;
     }
     int built_ins = built_in(argv);
     if (built_ins != 0) {
-        continue;
+        continue; // dont fork or execv, would fail automaticallly and exit out
+    }
+    int redirects = file_redirect(buf, input_index, output_index, input_file, output_file, output_flags);
+    pid_t pid;
+    if ((pid = fork()) == 0) { // enters child process
+        execv(argv[0], argv); //argv[0] is the file path
+        perror("child process could not do execv");
+    }
+    else if ((pid = fork()) != -1) { // enters wait mode
+        wait(NULL);
+    }
+    else { // if an error has ocurred
+        perror("error calling function fork()");
     }
     }
    return 0;
-
 }
 
 // write descr
@@ -94,12 +126,14 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
 
 // write descr
 // returns 0 if it failed, 1 otherwise
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char input_file, char output_file) {
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], int input_index, int output_index, char *input_file[30], char *output_file[30], int output_flags) {
     int i = 0; // index for tokens
     int k = 0; // index for argv array
     int flag1 = 0;
     int flag2 = 0;
     char r1[2] = {' ','\t'}; // characters to tokenize
+    input_file = "\0";
+    output_file = "\0";
     parse_helper(buffer,tokens,w_sym,r1);
     while (tokens[i] != NULL) {
         // check redirect followed by a token
@@ -130,6 +164,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
         else if (strcmp(tokens[i],">") == 0) { 
             // error check first
             flag2++; // set flag to 1- meaning that it was found
+            output_flags = 2; // O_TRUNC
             if (flag2 >1) { // if output redirect appeared 2x
             fprintf(stderr, "Can’t have two output redirects on one line.");
             return 0;
@@ -145,6 +180,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
         else if (strcmp(tokens[i],">>") == 0) {
             // error check first
             flag2++; // set flag to 1- meaning that it was found
+            output_flags = 2; // O_APPEND
             if (flag2 >1) { // if output redirect appeared 2x
             fprintf(stderr, "Can’t have two output redirects on one line.");
             return 0;
@@ -184,6 +220,56 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
     return 1;
 }
 
+// write descr
+// returns -1 if an error occured, 0 otherwise
+int file_redirect(char *buffer[1024], int input_index, int output_index, char *input_file[30], char *output_file[30], int output_flags) {
+    int closed = close(STDIN_FILENO);
+    if (closed != 0) {
+        perror("error: close");
+        return -1;
+    }
+    if (strcmp(input_file, "\0") !=0) { // if there is an input file
+        int open_descr = open(input_file, O_RDONLY); // open file to read
+        if (open_descr == -1) {
+            perror("error: open");
+            return -1;
+        }
+        int read_descr = read(open_descr, buffer, 1024);
+        if (read_descr == -1) {
+            perror("error: read");
+            return -1;
+        }
+        // what do i do after I call read?
+    }
+    if ((strcmp(output_file, "\0") !=0) && (output_flags == 1)) { // if there is an output file to truncate
+        int open_descr = open(output_file, O_CREAT|O_WRONLY|O_TRUNC, 0644); // open file to read
+        // is the mode correct
+        if (open_descr == -1) {
+            perror("error: open");
+            return -1;
+        }
+        int write_descr = write(open_descr, buffer, 1024);
+        if (write_descr == -1) {
+            perror("error: read");
+            return -1;
+        }
+    }
+    if ((strcmp(output_file, "\0") !=0) && (output_flags == 2)) { // if there is an output file to append
+        int open_descr = open(output_file, O_WRONLY|O_CREAT|O_APPEND, 0666); // open file to read
+        if (open_descr == -1) {
+            perror("error: open");
+            return -1;
+        }
+        int write_descr = write(open_descr, buffer, 1024);
+        if (write_descr == -1) {
+            perror("error: read");
+            return -1;
+        }
+        // do i do anything after or do i have to write differently for this redirect
+    }
+    return 0;
+}
+
 //write descr
 // returns -1 if error, 1 if no dir given, 0 if successful
 int built_in(char *argv[512]) {
@@ -195,7 +281,7 @@ int built_in(char *argv[512]) {
         }
         int cd_res = cd(dir); // pass in elt after 'cd'
         if (cd_res<0) { // error checking
-            perror("no such directory");
+            perror("error: no such directory");
             return -1;
         }
     }
@@ -204,7 +290,7 @@ int built_in(char *argv[512]) {
         char *dest = argv[2];
         int ln_res = ln(src,dest); // pass in args 1,2
         if (ln_res != 0) { // error checking
-            perror("failed to link");
+            perror("error: failed to link");
             return -1;
         }
     }
@@ -212,7 +298,7 @@ int built_in(char *argv[512]) {
         char *file = argv[1];
         int rm_res = rm(file); // pass in arg1
         if (rm_res != 0) { // error checking
-            perror("unable to delete the file");
+            perror("error: unable to delete the file");
             return -1;
         }
     }
@@ -234,5 +320,10 @@ int ln(char *src, char *dest) {
 
 // removes given input file from a directory using a pointer to the file
 int rm(char *file) {
-    return remove(file);
+    return remove(file); // unlink or remove???
+}
+
+// write descr
+void handle_child() {
+
 }
