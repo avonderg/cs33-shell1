@@ -7,7 +7,7 @@
 #include <fcntl.h>
 
 // function declarations
-void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20], const char path[30]);
+void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]);
 int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, const char path[30]);
 int built_in(char *argv[512]);
 int cd(char *dir);
@@ -102,7 +102,7 @@ int main() {
 }
 
 // write descr
-void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20], const char path[30]) {
+void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]) {
     char *temp; // temp string to hold values
     int n = 0;
     temp = strtok(buffer, r); // tokenizes temp char, only returns first token
@@ -112,7 +112,6 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
         n++;
     }
     char *first = strtok(buffer, r); // gets first token (binary name)
-    path = first; // sets path equal to the first token
       if (first == NULL) { // base case
         argv[0]= NULL;
       }
@@ -151,7 +150,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
     char r1[2] = {' ','\t'}; // characters to tokenize
     input_file = "\0";
     output_file = "\0";
-    parse_helper(buffer,tokens,w_sym,r1, path);
+    parse_helper(buffer,tokens,w_sym,r1);
     while (tokens[i] != NULL) { // looping through tokens array
         if (strcmp(tokens[i],"<") == 0) {
             // error check first
@@ -210,6 +209,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
         }
         else {  // otherwise, then add in element to argv
             argv[k] = w_sym[i];
+            path = tokens[i];
             k++;
         }
         i++;
@@ -336,9 +336,4 @@ int ln(char *src, char *dest) {
 // removes given input file from a directory using a pointer to the file
 int rm(char *file) {
     return remove(file); // unlink or remove???
-}
-
-// write descr
-void handle_child() {
-
 }
