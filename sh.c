@@ -71,7 +71,7 @@ int main() {
     char *input_file[30];
     char *output_file[30];
     int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
-    int parse_result = parse(*buf,tokens,argv,w_sym, *input_file, *output_file, output_flags, *path);
+    int parse_result = parse(buf,tokens,argv,w_sym, *input_file, *output_file, output_flags, *path);
     if (parse_result == 0) {
         continue;
     }
@@ -174,6 +174,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             // after error checking is complete
             // input_index = i;
             input_file = tokens[i+1];
+            path = tokens[i+2];
         }
         else if (strcmp(tokens[i],">") == 0) { 
             // error check first
@@ -190,6 +191,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             // after error checking is complete
             // output_index = i;
             output_file = tokens[i+1];
+            path = tokens[i+2];
         }
         else if (strcmp(tokens[i],">>") == 0) {
             // error check first
@@ -206,6 +208,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             // after error checking is complete
             // output_index = i;
             output_file = tokens[i+1];
+            path = tokens[i+2];
         }
         else {  // otherwise, then add in element to argv
             argv[k] = w_sym[i];
