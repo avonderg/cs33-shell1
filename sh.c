@@ -32,7 +32,6 @@ int file_redirect(char buffer[1024], char input_file[30], char output_file[30], 
 // call parse in the main (parent)
 // in the child is where you read/write
 // execv is going to take in argv array and pointers to input file and output file
-// in parse set a tracker whether you are appending or truncating
 int main() {
     //repl (read eval print loop)
     while (1) {
@@ -59,7 +58,7 @@ int main() {
         perror("error: read");
         return 1;
     }
-    else if (to_read == 0) { // end program / restart
+    else if (to_read == 0) { // restart program
         return 0;
     }
     buf[to_read] = '\0'; // since the read function does not null-terminate the buffer
@@ -153,9 +152,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
     input_file = "\0";
     output_file = "\0";
     parse_helper(buffer,tokens,w_sym,r1, path);
-    while (tokens[i] != NULL) {
-        // check redirect followed by a token
-        // no redirect file
+    while (tokens[i] != NULL) { // looping through tokens array
         if (strcmp(tokens[i],"<") == 0) {
             // error check first
             flag1++; // set flag to 1- meaning that it was found
