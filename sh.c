@@ -147,7 +147,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
     int k = 0; // index for argv array
     int flag1 = 0;
     int flag2 = 0;
-    char r1[3] = {' ','\t', '\n'}; // characters to tokenize
+    char r1[3] = {' ','\t','\n'}; // characters to tokenize
     input_file = "\0";
     output_file = "\0";
     parse_helper(buffer,tokens,w_sym,r1);
