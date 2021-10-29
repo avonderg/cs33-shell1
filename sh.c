@@ -252,11 +252,11 @@ int file_redirect(char buffer[1024], char input_file[30], char output_file[30], 
             perror("error: open");
             return -1;
         }
-        ssize_t read_descr = read(open_descr, buffer, 1024);
-        if (read_descr == -1) {
-            perror("error: read");
-            return -1;
-        }
+        // ssize_t read_descr = read(open_descr, buffer, 1024);
+        // if (read_descr == -1) {
+        //     perror("error: read");
+        //     return -1;
+        // }
         // what do i do after I call read?
     }
     if ((strcmp(output_file, "\0") !=0) && (output_flags == 1)) { // if there is an output file to truncate
@@ -266,11 +266,13 @@ int file_redirect(char buffer[1024], char input_file[30], char output_file[30], 
             perror("error: open");
             return -1;
         }
-        ssize_t write_descr = write(open_descr, buffer, 1024);
-        if (write_descr == -1) {
-            perror("error: read");
-            return -1;
-        }
+        // ssize_t write_descr = write(open_descr, buffer, 1024); 
+        // // close stdin
+        // // next file has same #
+        // if (write_descr == -1) {
+        //     perror("error: read");
+        //     return -1;
+        // }
     }
     if ((strcmp(output_file, "\0") !=0) && (output_flags == 2)) { // if there is an output file to append
         int open_descr = open(output_file, O_WRONLY|O_CREAT|O_APPEND, 0666); // open file to read
@@ -278,12 +280,11 @@ int file_redirect(char buffer[1024], char input_file[30], char output_file[30], 
             perror("error: open");
             return -1;
         }
-        ssize_t write_descr = write(open_descr, buffer, 1024);
-        if (write_descr == -1) {
-            perror("error: read");
-            return -1;
-        }
-        // do i do anything after or do i have to write differently for this redirect
+        // ssize_t write_descr = write(open_descr, buffer, 1024);
+        // if (write_descr == -1) {
+        //     perror("error: read");
+        //     return -1;
+        // }
     }
     return 0;
 }
@@ -302,6 +303,7 @@ int built_in(char *argv[512]) {
             perror("error: no such directory");
             return -1;
         }
+        exit(0);
     }
     else if (strcmp(argv[0], "ln") ==0) { // if the command is ln
         // char *src = argv[1];
@@ -312,6 +314,7 @@ int built_in(char *argv[512]) {
             perror("error: failed to link");
             return -1;
         }
+        exit(0);
     }
     else if (strcmp(argv[0], "rm") ==0) { // if the command is rm
         char *file = argv[1];
@@ -320,6 +323,7 @@ int built_in(char *argv[512]) {
             perror("error: unable to delete the file");
             return -1;
         }
+        exit(0);
     }
     else if (strcmp(argv[0], "exit") ==0) { // if the command is exit
         exit(0);
