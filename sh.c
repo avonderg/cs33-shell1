@@ -79,7 +79,7 @@ int main() {
     if (built_ins != 0) {
         continue; // dont fork or execv, would fail automaticallly and exit out
     }
-    if ((strcmp(argv[0],"cd") != 0) && (strcmp(argv[0],"ln") != 0) && (strcmp(argv[0],"rm") != 0) (strcmp(argv[0],"exit") != 0)) { //error check
+    if ((strcmp(argv[0],"cd") != 0) && (strcmp(argv[0],"ln") != 0) && (strcmp(argv[0],"rm") != 0) && (strcmp(argv[0],"exit") != 0)) { //error check
     int redirects = file_redirect(*buf, *input_file, *output_file, output_flags);
     if (redirects == -1) { // if an error has occured
         continue; 
