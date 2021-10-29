@@ -306,7 +306,8 @@ int built_in(char *argv[512]) {
     else if (strcmp(argv[0], "ln") ==0) { // if the command is ln
         // char *src = argv[1];
         // char *dest = argv[1];
-        int ln_res = ln(argv[1],argv[2]); // pass in args 1,2
+        // int ln_res = ln(argv[1],argv[2]); // pass in args 1,2
+        int ln_res = link(arv[1], argv[2]);
         if (ln_res != 0) { // error checking
             perror("error: failed to link");
             return -1;
