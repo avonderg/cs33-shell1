@@ -81,10 +81,10 @@ int main() {
         continue;
     }
     int built_ins = built_in(argv);
-    if (built_ins == -1) {
-        continue; // dont fork or execv, would fail automaticallly and exit out
-        // p error out
-    } // don't need this
+    // if (built_ins == -1) {
+    //     continue; // dont fork or execv, would fail automaticallly and exit out
+    //     // p error out
+    // } // don't need this
     if (built_ins == 0) {
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
@@ -137,7 +137,6 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
           }
       else {
         argv[0]= last; //otherwise, set first argument equal to the following one
-
       }
       }
       int index = 1;
@@ -201,6 +200,8 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             input_file = tokens[i+1];
             argv[k] = w_sym[i+2];
             k++;
+            // cd /usr/bin/something 
+            // get stuff after forward slash
         }
         else if (strcmp(tokens[i],">") == 0) { 
             // error check first
@@ -347,20 +348,23 @@ int built_in(char *argv[512]) {
         return 1;
     }
     else if (strcmp(argv[0], "ln") ==0) { // if the command is ln
-        // char *src = argv[1];
-        // char *dest = argv[1];
-        // int ln_res = ln(argv[1],argv[2]); // pass in args 1,2
-        int ln_res = link(argv[1], argv[2]);
-        if (ln_res != 0) { // error checking
+        if (argv[1] == NULL)  {
+            fprintf(stderr, "error: no source");
+        }
+        else if (argv[2] == NULL) {
+            fprintf(stderr, "error: no output");
+        }
+        else if (link(argv[1], argv[2]) != 0) { // error checking
             perror("error: failed to link");
             return -1;
         }
         return 1;
     }
     else if (strcmp(argv[0], "rm") ==0) { // if the command is rm
-        char *file = argv[1];
-        int rm_res = rm(file); // pass in arg1
-        if (rm_res != 0) { // error checking
+        if (argv[1] == NULL)  {
+            fprintf(stderr, "error: no source");
+        }
+        else if (unlink(argv[1]) != 0) {
             perror("error: unable to delete the file");
             return -1;
         }
@@ -370,19 +374,4 @@ int built_in(char *argv[512]) {
         exit(0);
     }
     return 0;
-}
-
-// given a pointer to the input directory, changes the current working directory 
-int cd(char *dir) {
-    return chdir(dir); // returns 0 if change of directory was successful, -1 otherwise
-}
-
-// given a source and destination, makes a hard link to a file
-int ln(char *src, char *dest) {
-   return link(src,dest);
-}
-
-// removes given input file from a directory using a pointer to the file
-int rm(char *file) {
-    return remove(file); // unlink or remove???
 }
