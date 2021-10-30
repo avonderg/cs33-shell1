@@ -293,7 +293,7 @@ int file_redirect(char buffer[1024], char input_file[30], char output_file[30], 
         // }
         // what do i do after I call read?
     }
-    if ((strcmp(output_file, "\0") !=0) && (output_flags == 1)) { // if there is an output file to truncate
+    if ((output_file != NULL) && (output_flags == 1)) { // if there is an output file to truncate
         int closed = close(STDOUT_FILENO);
         if (closed != 0) {
         perror("error: close");
@@ -313,7 +313,7 @@ int file_redirect(char buffer[1024], char input_file[30], char output_file[30], 
         //     return -1;
         // }
     }
-    if ((strcmp(output_file, "\0") !=0) && (output_flags == 2)) { // if there is an output file to append
+    if ((output_file != NULL) && (output_flags == 2)) { // if there is an output file to append
         int closed = close(STDOUT_FILENO);
         if (closed != 0) {
         perror("error: close");
