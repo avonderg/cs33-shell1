@@ -282,7 +282,7 @@ int file_redirect(char buffer[1024], char** input_file, char** output_file, int 
         perror("error: close");
         return -1;
     }
-        int open_descr = open(*input_file, O_RDONLY); // open file to read
+        int open_descr = open(&input_file, O_RDONLY); // open file to read
         if (open_descr == -1) {
             perror("error: open");
             return -1;
@@ -300,7 +300,7 @@ int file_redirect(char buffer[1024], char** input_file, char** output_file, int 
         perror("error: close");
         return -1;
         } 
-        int open_descr = open(*output_file, O_CREAT|O_WRONLY|O_TRUNC, 0644); // open file to read
+        int open_descr = open(&output_file, O_CREAT|O_WRONLY|O_TRUNC, 0644); // open file to read
         // is the mode correct
         if (open_descr == -1) {
             perror("error: open");
@@ -320,7 +320,7 @@ int file_redirect(char buffer[1024], char** input_file, char** output_file, int 
         perror("error: close");
         return -1;
         }
-        int open_descr = open(*output_file, O_WRONLY|O_CREAT|O_APPEND, 0666); // open file to read
+        int open_descr = open(&output_file, O_WRONLY|O_CREAT|O_APPEND, 0666); // open file to read
         if (open_descr == -1) {
             perror("error: open");
             return -1;
