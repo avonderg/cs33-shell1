@@ -217,10 +217,12 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
         }
         else {  // otherwise, then add in element to argv
             argv[k] = w_sym[i];
-            path = tokens[i];
             k++;
         }
         i++;
+    }
+    if (flag1 != 1 && flag2 != 1) {
+        path = tokens[0];
     }
 // check whether you have mult of teh same input/output redirection
 
