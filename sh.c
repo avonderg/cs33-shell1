@@ -54,12 +54,15 @@ int main() {
     // reading system call to get user input
     to_read = read(fd, buf, count);
     // error-checking
+    if (buf == NULL) {
+        return 0;
+    }
     if (to_read == -1) { 
         perror("error: read");
         return 1;
     }
     else if (to_read == 0) { // restart program
-        return 0;
+        return 0; // returns 1 or 0?
     }
     buf[to_read] = '\0'; // since the read function does not null-terminate the buffer
     char *tokens[512];
@@ -76,12 +79,14 @@ int main() {
         continue;
     }
     int built_ins = built_in(argv);
-    if (built_ins != 0) {
+    if (built_ins == -1) {
         continue; // dont fork or execv, would fail automaticallly and exit out
     }
-    int redirects = file_redirect(*buf, *input_file, *output_file, output_flags);
-    if (redirects == -1) { // if an error has occured
-        continue; 
+    if (built_ins == 0) { // if there was no command inputted
+        int redirects = file_redirect(*buf, *input_file, *output_file, output_flags);
+        if (redirects == -1) { // if an error has occured
+            continue; 
+        }
     }
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
@@ -290,7 +295,7 @@ int file_redirect(char buffer[1024], char input_file[30], char output_file[30], 
 }
 
 //write descr
-// returns -1 if error, 1 if no dir given, 0 if successful
+// returns -1 if error, 1 if successful, 0 if none given
 int built_in(char *argv[512]) {
     if (strcmp(argv[0], "cd") ==0) { // if the command is cd
         char *dir = argv[1];
@@ -303,6 +308,7 @@ int built_in(char *argv[512]) {
             perror("error: no such directory");
             return -1;
         }
+        return 1;
     }
     else if (strcmp(argv[0], "ln") ==0) { // if the command is ln
         // char *src = argv[1];
@@ -313,6 +319,7 @@ int built_in(char *argv[512]) {
             perror("error: failed to link");
             return -1;
         }
+        return 1;
     }
     else if (strcmp(argv[0], "rm") ==0) { // if the command is rm
         char *file = argv[1];
@@ -321,6 +328,7 @@ int built_in(char *argv[512]) {
             perror("error: unable to delete the file");
             return -1;
         }
+        return 1;
     }
     else if (strcmp(argv[0], "exit") ==0) { // if the command is exit
         exit(0);
