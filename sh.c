@@ -61,7 +61,7 @@ int main() {
         return 1;
     }
     else if (to_read == 0) { // restart program
-        return 0; // 0 means end of file
+        return 1; // 0 means end of file
     }
     buf[to_read] = '\0'; // since the read function does not null-terminate the buffer
     char *tokens[512];
@@ -73,7 +73,7 @@ int main() {
     int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
     int parse_result = parse(buf,tokens,argv,w_sym, &input_file, &output_file, output_flags, &path);
     if (argv[0] == NULL) {
-        return 0;
+        return 1;
     }
     if (parse_result == 0) {
         continue;
