@@ -79,16 +79,10 @@ int main() {
     if (built_ins != 0) {
         continue; // dont fork or execv, would fail automaticallly and exit out
     }
-    if ((strcmp(argv[0],"cd") != 0) && (strcmp(argv[0],"ln") != 0) && (strcmp(argv[0],"rm") != 0) && (strcmp(argv[0],"exit") != 0)) { //error check
     int redirects = file_redirect(*buf, *input_file, *output_file, output_flags);
     if (redirects == -1) { // if an error has occured
         continue; 
     }
-    }
-    // int redirects = file_redirect(*buf, *input_file, *output_file, output_flags);
-    // if (redirects == -1) { // if an error has occured
-    //     continue; 
-    // }
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
         int exec = execv(*path, argv);
@@ -97,7 +91,7 @@ int main() {
         }
         perror("child process could not do execv");
     }
-    else if ((pid = fork()) != -1) { // enters wait mode
+    else if (pid != -1) { // enters wait mode
         wait(NULL);
     }
     else { // if an error has ocurred
