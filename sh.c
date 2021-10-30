@@ -47,7 +47,7 @@ int main() {
     #endif
 
     // initializing
-    char *buf[1024];
+    char buf[1024];
     int fd = STDIN_FILENO;
     size_t count = 1024;
     ssize_t to_read;
@@ -71,10 +71,10 @@ int main() {
     // int input_index;
     // int output_index;
     char path[30];
-    char *input_file[30];
-    char *output_file[30];
+    char input_file[30];
+    char output_file[30];
     int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
-    int parse_result = parse(buf,tokens,argv,w_sym, *input_file, *output_file, output_flags, path);
+    int parse_result = parse(buf,tokens,argv,w_sym, input_file, output_file, output_flags, path);
     if (parse_result == 0) {
         continue;
     }
@@ -82,14 +82,12 @@ int main() {
     if (built_ins == -1) {
         continue; // dont fork or execv, would fail automaticallly and exit out
     }
-    if (built_ins == 0) { // if there was no command inputted
-        int redirects = file_redirect(*buf, *input_file, *output_file, output_flags);
+    pid_t pid;
+    if ((pid = fork()) == 0) { // enters child process
+        int redirects = file_redirect(buf, input_file, output_file, output_flags);
         if (redirects == -1) { // if an error has occured
             continue; 
         }
-    }
-    pid_t pid;
-    if ((pid = fork()) == 0) { // enters child process
         int exec = execv(path, argv);
         if (exec == -1) {
             perror("execv");
