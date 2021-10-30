@@ -82,6 +82,7 @@ int main() {
     if (built_ins == -1) {
         continue; // dont fork or execv, would fail automaticallly and exit out
     }
+    if (built_ins == 0) {
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
         int redirects = file_redirect(buf, input_file, output_file, output_flags);
@@ -99,6 +100,7 @@ int main() {
     }
     else { // if an error has ocurred
         perror("error calling function fork()");
+    }
     }
     }
    return 0;
