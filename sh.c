@@ -205,7 +205,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
         else if (strcmp(tokens[i],">") == 0) { 
             // error check first
             flag2++; // set flag to 1- meaning that it was found
-            *output_flags = 2; // O_TRUNC
+            output_flags = 2; // O_TRUNC
             if (flag2 >1) { // if output redirect appeared 2x
             fprintf(stderr, "Can’t have two output redirects on one line.");
             return 0;
@@ -223,7 +223,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
         else if (strcmp(tokens[i],">>") == 0) {
             // error check first
             flag2++; // set flag to 1- meaning that it was found
-            *output_flags = 2; // O_APPEND
+            output_flags = 2; // O_APPEND
             if (flag2 >1) { // if output redirect appeared 2x
             fprintf(stderr, "Can’t have two output redirects on one line.");
             return 0;
