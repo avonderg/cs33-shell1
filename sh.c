@@ -83,7 +83,8 @@ int main() {
     int built_ins = built_in(argv);
     if (built_ins == -1) {
         continue; // dont fork or execv, would fail automaticallly and exit out
-    }
+        // p error out
+    } // don't need this
     if (built_ins == 0) {
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
@@ -335,15 +336,13 @@ int file_redirect(char buffer[1024], char input_file[30], char output_file[30], 
 // returns -1 if error, 1 if successful, 0 if none given
 int built_in(char *argv[512]) {
     if (strcmp(argv[0], "cd") ==0) { // if the command is cd
-        char *dir = argv[1];
-        if (dir == NULL) {
-            cd(getenv("HOME")); // go to home directory if no path given
-            return 1;
+        // char *dir = argv[1];
+         // pass in elt after 'cd'
+        if (argv[1] == NULL) {
+            fprintf(stderr, "error: no directory");
         }
-        int cd_res = cd(dir); // pass in elt after 'cd'
-        if (cd_res<0) { // error checking
-            perror("error: no such directory");
-            return -1;
+        else if (chdir(argv[1]) == -1) {
+            perror(argv[0]);
         }
         return 1;
     }
