@@ -14,7 +14,7 @@ int cd(char *dir);
 int ln(char *src, char *dest);
 int rm(char *file);
 int file_redirect(char buffer[1024], char** input_file, char** output_file, int output_flags);
-void set_path(char *tokens[512], char** path);
+int set_path(char *tokens[512], char** path);
 // close stdin
 // open given file
 // if no input/output file
@@ -119,7 +119,7 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
         n++;
     }
     if (tokens[0] == NULL) {
-        argv[0] == NULL;
+        argv[0] = NULL;
     }
     char *first = strtok(buffer, r); // gets first token (binary name)
       if (first == NULL) { // base case
@@ -149,13 +149,13 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
     }
 
 // write descr
-void set_path(char *tokens[512], char** path) {
+// returns 0 when done
+int set_path(char *tokens[512], char** path) {
     int i = 0;
     while (tokens[i] != NULL) {
         if ((strcmp(tokens[i],"<") != 0) && (strcmp(tokens[i],">") != 0) && (strcmp(tokens[i],">>") != 0)) {
-            if(strchr(tokens[i], '/') != NULL) {
-            tokens[i] = path;
-            }
+            *path = tokens[i];
+            return 0;
         }
         else { // if the current index is a symbol
             i++; // skip over an index (the file)
