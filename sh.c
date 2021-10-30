@@ -54,15 +54,14 @@ int main() {
     // reading system call to get user input
     to_read = read(fd, buf, count);
     // error-checking
-    if (buf == NULL) {
-        return 0;
-    }
+    // check if its equal to \n or spaces 
+    // check argv array (case where there are no tokens)
     if (to_read == -1) { 
         perror("error: read");
         return 1;
     }
     else if (to_read == 0) { // restart program
-        return 0; // returns 1 or 0?
+        return 0; // 0 means end of file
     }
     buf[to_read] = '\0'; // since the read function does not null-terminate the buffer
     char *tokens[512];
@@ -75,6 +74,9 @@ int main() {
     char output_file[30];
     int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
     int parse_result = parse(buf,tokens,argv,w_sym, input_file, output_file, output_flags, path);
+    if (tokens == NULL) {
+        return 0;
+    }
     if (parse_result == 0) {
         continue;
     }
@@ -100,6 +102,7 @@ int main() {
     }
     else { // if an error has ocurred
         perror("error calling function fork()");
+        exit(0);
     }
     }
     }
@@ -213,8 +216,8 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             output_file = tokens[i+1];
         }
         else {  // otherwise, then add in element to argv
-            argv[k] = w_sym[i];
-            k++;
+            argv[k] = w_sym[i]; // replace argv[0] with binary name
+            k++; // record filepath
         }
         i++;
     }
@@ -249,12 +252,12 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
 // write descr
 // returns -1 if an error occured, 0 otherwise
 int file_redirect(char buffer[1024], char input_file[30], char output_file[30], int output_flags) {
+    if (input_file != NULL) { // if there is an input file
     int closed = close(STDIN_FILENO);
     if (closed != 0) {
         perror("error: close");
         return -1;
     }
-    if (strcmp(input_file, "\0") !=0) { // if there is an input file
         int open_descr = open(input_file, O_RDONLY); // open file to read
         if (open_descr == -1) {
             perror("error: open");
@@ -268,6 +271,11 @@ int file_redirect(char buffer[1024], char input_file[30], char output_file[30], 
         // what do i do after I call read?
     }
     if ((strcmp(output_file, "\0") !=0) && (output_flags == 1)) { // if there is an output file to truncate
+        int closed = close(STDOUT_FILENO);
+        if (closed != 0) {
+        perror("error: close");
+        return -1;
+        } 
         int open_descr = open(output_file, O_CREAT|O_WRONLY|O_TRUNC, 0644); // open file to read
         // is the mode correct
         if (open_descr == -1) {
@@ -283,6 +291,11 @@ int file_redirect(char buffer[1024], char input_file[30], char output_file[30], 
         // }
     }
     if ((strcmp(output_file, "\0") !=0) && (output_flags == 2)) { // if there is an output file to append
+        int closed = close(STDOUT_FILENO);
+        if (closed != 0) {
+        perror("error: close");
+        return -1;
+        }
         int open_descr = open(output_file, O_WRONLY|O_CREAT|O_APPEND, 0666); // open file to read
         if (open_descr == -1) {
             perror("error: open");
