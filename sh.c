@@ -8,13 +8,13 @@
 
 // function declarations
 void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]);
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, char path[30]);
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char** input_file[30], char** output_file[30], int output_flags, char** path[30]);
 int built_in(char *argv[512]);
 int cd(char *dir);
 int ln(char *src, char *dest);
 int rm(char *file);
-int file_redirect(char buffer[1024], char input_file[30], char output_file[30], int output_files);
-void set_path(char *tokens[512], char path[30]);
+int file_redirect(char buffer[1024], char** input_file[30], char** output_file[30], int output_flags);
+void set_path(char *tokens[512], char** path[30]);
 // close stdin
 // open given file
 // if no input/output file
@@ -67,11 +67,11 @@ int main() {
     char *tokens[512];
     char *argv[512];
     char *w_sym[512];
-    char path[30];
+    char *path[30];
     char* input_file = NULL;
     char* output_file = NULL;
     int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
-    int parse_result = parse(buf,tokens,argv,w_sym, &input_file, &output_file, output_flags, path);
+    int parse_result = parse(buf,tokens,argv,w_sym, &input_file, &output_file, output_flags, &path);
     if (argv[0] == NULL) {
         return 0;
     }
@@ -146,7 +146,7 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
     }
 
 // write descr
-void set_path(char *tokens[512], char path[30]) {
+void set_path(char *tokens[512], char** path[30]) {
     int i = 0;
     while (tokens[i] != NULL) {
         if ((strcmp(tokens[i],"<") != 0) && (strcmp(tokens[i],">") != 0) && (strcmp(tokens[i],">>") != 0)) {
@@ -164,7 +164,7 @@ void set_path(char *tokens[512], char path[30]) {
 
 // write descr
 // returns 0 if it failed, 1 otherwise
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, char path[30]) {
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char** input_file[30], char** output_file[30], int output_flags, char** path[30]) {
     int i = 0; // index for tokens
     int k = 0; // index for argv array
     int flag1 = 0;
@@ -270,7 +270,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
 
 // write descr
 // returns -1 if an error occured, 0 otherwise
-int file_redirect(char buffer[1024], char input_file[30], char output_file[30], int output_flags) {
+int file_redirect(char buffer[1024], char** input_file[30], char** output_file[30], int output_flags) {
     if (input_file != NULL) { // if there is an input file
     int closed = close(STDIN_FILENO);
     if (closed != 0) {
