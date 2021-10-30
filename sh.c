@@ -90,7 +90,7 @@ int main() {
     }
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
-        int exec = execv(*path, argv);
+        int exec = execv(path, argv);
         if (exec == -1) {
             perror("execv");
         }
