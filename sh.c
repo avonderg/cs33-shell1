@@ -8,12 +8,12 @@
 
 // function declarations
 void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]);
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], const char** input_file, const char** output_file, int output_flags, char** path);
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], const char** input_file, const char** output_file, int** output_flags, char** path);
 int built_in(char *argv[512]);
 int cd(char *dir);
 int ln(char *src, char *dest);
 int rm(char *file);
-int file_redirect(const char** input_file, const char** output_file, int output_flags);
+int file_redirect(const char** input_file, const char** output_file, int** output_flags);
 int set_path(char *tokens[512], char** path);
 // close stdin
 // open given file
@@ -70,8 +70,8 @@ int main() {
     char *path = NULL;
     const char *input_file = NULL;
     const char *output_file = NULL;
-    int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
-    int parse_result = parse(buf,tokens,argv,w_sym, &input_file, &output_file, output_flags, &path);
+    int *output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
+    int parse_result = parse(buf,tokens,argv,w_sym, &input_file, &output_file, &output_flags, &path);
     if (argv[0] == NULL) {
         continue;
     }
@@ -167,7 +167,7 @@ int set_path(char *tokens[512], char** path) {
 
 // write descr
 // returns 0 if it failed, 1 otherwise
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], const char** input_file, const char** output_file, int output_flags, char** path) {
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], const char** input_file, const char** output_file, int** output_flags, char** path) {
     int i = 0; // index for tokens
     int k = 0; // index for argv array
     int flag1 = 0;
@@ -205,7 +205,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
         else if (strcmp(tokens[i],">") == 0) { 
             // error check first
             flag2++; // set flag to 1- meaning that it was found
-            output_flags = 2; // O_TRUNC
+            *output_flags = 2; // O_TRUNC
             if (flag2 >1) { // if output redirect appeared 2x
             fprintf(stderr, "Can’t have two output redirects on one line.");
             return 0;
@@ -223,7 +223,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
         else if (strcmp(tokens[i],">>") == 0) {
             // error check first
             flag2++; // set flag to 1- meaning that it was found
-            output_flags = 2; // O_APPEND
+            *output_flags = 2; // O_APPEND
             if (flag2 >1) { // if output redirect appeared 2x
             fprintf(stderr, "Can’t have two output redirects on one line.");
             return 0;
@@ -273,7 +273,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
 
 // write descr
 // returns -1 if an error occured, 0 otherwise
-int file_redirect(const char** input_file, const char** output_file, int output_flags) {
+int file_redirect(const char** input_file, const char** output_file, int** output_flags) {
     if (*input_file != NULL) { // if there is an input file
     int closed = close(STDIN_FILENO);
     if (closed != 0) {
@@ -292,7 +292,7 @@ int file_redirect(const char** input_file, const char** output_file, int output_
         // }
         // what do i do after I call read?
     }
-    if ((*output_file != NULL) && (output_flags == 1)) { // if there is an output file to truncate
+    if ((*output_file != NULL) && (*output_flags == 1)) { // if there is an output file to truncate
         int closed = close(STDOUT_FILENO);
         if (closed != 0) {
         perror("error: close");
@@ -312,7 +312,7 @@ int file_redirect(const char** input_file, const char** output_file, int output_
         //     return -1;
         // }
     }
-    if ((*output_file != NULL) && (output_flags == 2)) { // if there is an output file to append
+    if ((*output_file != NULL) && (*output_flags == 2)) { // if there is an output file to append
         int closed = close(STDOUT_FILENO);
         if (closed != 0) {
         perror("error: close");
