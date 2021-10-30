@@ -147,7 +147,7 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
 
 // write descr
 // returns 0 if it failed, 1 otherwise
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, const char path[30]) {
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, char path[30]) {
     int i = 0; // index for tokens
     int k = 0; // index for argv array
     int flag1 = 0;
