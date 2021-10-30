@@ -14,7 +14,7 @@ int cd(char *dir);
 int ln(char *src, char *dest);
 int rm(char *file);
 int file_redirect(char buffer[1024], char input_file[30], char output_file[30], int output_files);
-
+void set_path(char *tokens[512], char *argv[512], char *w_sym[512], char path[30]);
 // close stdin
 // open given file
 // if no input/output file
@@ -147,6 +147,22 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
       }
     }
 
+// write descr
+void set_path(char *tokens[512], char path[30]) {
+    int i = 0;
+    while (tokens[i] != NULL) {
+        if ((strcmp(tokens[i],"<") != 0) && (strcmp(tokens[i],">") != 0) && (strcmp(tokens[i],">>") != 0)) {
+            if(strchr(tokens[i], '/') != NULL) {
+            tokens[i] = path;
+            }
+        }
+        else { // if the current index is a symbol
+            i++; // skip over an index (the file)
+        }
+    i++;
+    }
+}
+
 
 // write descr
 // returns 0 if it failed, 1 otherwise
@@ -231,8 +247,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
         path = tokens[0];
     }
     else  {
-        path = tokens[2]; // fix
-        // deal with redirects first, and then filepath
+        set_path(tokens, path);
     }
 // check whether you have mult of teh same input/output redirection
 
