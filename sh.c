@@ -68,8 +68,8 @@ int main() {
     char *argv[512];
     char *w_sym[512];
     char *path[30];
-    char* input_file = NULL;
-    char* output_file = NULL;
+    char *input_file = NULL;
+    char *output_file = NULL;
     int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
     int parse_result = parse(buf,tokens,argv,w_sym, &input_file, &output_file, output_flags, &path);
     if (argv[0] == NULL) {
