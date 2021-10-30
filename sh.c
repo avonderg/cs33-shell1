@@ -73,29 +73,29 @@ int main() {
     int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
     int parse_result = parse(buf,tokens,argv,w_sym, &input_file, &output_file, output_flags, &path);
     if (argv[0] == NULL) {
-        // return 1;
         continue;
     }
     if (parse_result == 0) {
         continue;
     }
     int built_ins = built_in(argv);
-    // if (built_ins == -1) {
-    //     continue; // dont fork or execv, would fail automaticallly and exit out
-    //     // p error out
-    // } // don't need this
+    if (built_ins == -1) {
+        return 1;
+    } 
     if (built_ins == 0) {
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
         int redirects = file_redirect(buf, &input_file, &output_file, output_flags);
         if (redirects == -1) { // if an error has occured
-            continue; 
+            return 1; 
         }
         int exec = execv(path, argv);
         if (exec == -1) {
             perror("execv");
+            return 1;
         }
         perror("child process could not do execv");
+        return 1;
     }
     else if (pid > 0) { // enters wait mode
         wait(NULL);
