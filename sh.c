@@ -8,7 +8,7 @@
 
 // function declarations
 void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]);
-int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, const char path[30]);
+int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], char input_file[30], char output_file[30], int output_flags, char path[30]);
 int built_in(char *argv[512]);
 int cd(char *dir);
 int ln(char *src, char *dest);
@@ -70,7 +70,7 @@ int main() {
     char *w_sym[512];
     // int input_index;
     // int output_index;
-    const char *path[30];
+    char *path[30];
     char *input_file[30];
     char *output_file[30];
     int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
