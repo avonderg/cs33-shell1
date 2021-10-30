@@ -67,15 +67,11 @@ int main() {
     char *tokens[512];
     char *argv[512];
     char *w_sym[512];
-    // int input_index;
-    // int output_index;
     char path[30];
-    char input_file[30];
-    memset(input_file, 0, 30);
-    char output_file[30];
-    memset(output_file, 0, 30);
+    char* input_file = NULL;
+    char* output_file = NULL;
     int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
-    int parse_result = parse(buf,tokens,argv,w_sym, input_file, output_file, output_flags, path);
+    int parse_result = parse(buf,tokens,argv,w_sym, &input_file, &output_file, output_flags, path);
     if (argv[0] == NULL) {
         return 0;
     }
@@ -90,7 +86,7 @@ int main() {
     if (built_ins == 0) {
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
-        int redirects = file_redirect(buf, input_file, output_file, output_flags);
+        int redirects = file_redirect(buf, &input_file, &output_file, output_flags);
         if (redirects == -1) { // if an error has occured
             continue; 
         }
@@ -174,8 +170,6 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
     int flag1 = 0;
     int flag2 = 0;
     char r1[3] = {' ','\t','\n'}; // characters to tokenize
-    // input_file = "\0";
-    // output_file = "\0";
     parse_helper(buffer,tokens,w_sym,r1);
     while (tokens[i] != NULL) { // looping through tokens array
         if (strcmp(tokens[i],"<") == 0) {
