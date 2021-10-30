@@ -14,7 +14,7 @@ int cd(char *dir);
 int ln(char *src, char *dest);
 int rm(char *file);
 int file_redirect(char buffer[1024], char input_file[30], char output_file[30], int output_files);
-void set_path(char *tokens[512], char *argv[512], char *w_sym[512], char path[30]);
+void set_path(char *tokens[512], char path[30]);
 // close stdin
 // open given file
 // if no input/output file
@@ -74,7 +74,7 @@ int main() {
     char output_file[30];
     int output_flags; // flag is set to 2 if flag = O_APPEND, and 1 if flag = O_TRUNC
     int parse_result = parse(buf,tokens,argv,w_sym, input_file, output_file, output_flags, path);
-    if (tokens == NULL) {
+    if (tokens[0] == NULL) {
         return 0;
     }
     if (parse_result == 0) {
