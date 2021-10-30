@@ -276,7 +276,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
 // write descr
 // returns -1 if an error occured, 0 otherwise
 int file_redirect(char buffer[1024], char** input_file, char** output_file, int output_flags) {
-    if (input_file != NULL) { // if there is an input file
+    if (*input_file != NULL) { // if there is an input file
     int closed = close(STDIN_FILENO);
     if (closed != 0) {
         perror("error: close");
@@ -294,7 +294,7 @@ int file_redirect(char buffer[1024], char** input_file, char** output_file, int 
         // }
         // what do i do after I call read?
     }
-    if ((output_file != NULL) && (output_flags == 1)) { // if there is an output file to truncate
+    if ((*output_file != NULL) && (output_flags == 1)) { // if there is an output file to truncate
         int closed = close(STDOUT_FILENO);
         if (closed != 0) {
         perror("error: close");
@@ -314,7 +314,7 @@ int file_redirect(char buffer[1024], char** input_file, char** output_file, int 
         //     return -1;
         // }
     }
-    if ((output_file != NULL) && (output_flags == 2)) { // if there is an output file to append
+    if ((*output_file != NULL) && (output_flags == 2)) { // if there is an output file to append
         int closed = close(STDOUT_FILENO);
         if (closed != 0) {
         perror("error: close");
