@@ -366,7 +366,7 @@ int built_in(char *argv[512]) {
             fprintf(stderr, "ln: syntax error");
         }
         else if (link(argv[1], argv[2]) != 0) { // error checking
-            perror("error: failed to link");
+            perror("link");
             return -1;
         }
         return 1;
@@ -376,7 +376,7 @@ int built_in(char *argv[512]) {
             fprintf(stderr, "rm: syntax error");
         }
         else if (unlink(argv[1]) != 0) {
-            perror("error: unable to delete the file");
+            perror("unlink");
             return -1;
         }
         return 1;
