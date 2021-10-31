@@ -9,7 +9,7 @@
 // function declarations
 void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]);
 int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], const char** input_file, const char** output_file, int* output_flags, char** path);
-int built_in(char *argv[512], char** path);
+int built_in(char *argv[512]);
 int cd(char *dir);
 int ln(char *src, char *dest);
 int rm(char *file);
@@ -85,7 +85,7 @@ int main() {
     if (parse_result == 0) {
         continue;
     }
-    int built_ins = built_in(argv, &path); 
+    int built_ins = built_in(argv); 
     if (built_ins == 0) {
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
@@ -293,7 +293,7 @@ int file_redirect(const char** input_file, const char** output_file, int* output
 
 //write descr
 // returns -1 if error, 1 if successful, 0 if none given
-int built_in(char *argv[512], char** path) {
+int built_in(char *argv[512]) {
     if (strcmp(argv[0], "cd") ==0) { // if the command is cd
         // char *dir = argv[1];
          // pass in elt after 'cd'
