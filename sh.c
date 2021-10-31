@@ -206,7 +206,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             i+=2;
             argv[k] = w_sym[i];
             k++;
-            i++;
+            // i++;
             // cd /usr/bin/something 
             // get stuff after forward slash
         }
@@ -228,7 +228,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             i+=2;
             argv[k] = w_sym[i];
             k++;
-            i++;
+            // i++;
         }
         else if (strcmp(tokens[i],">>") == 0) {
             // error check first
@@ -248,7 +248,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             i+=2;
             argv[k] = w_sym[i];
             k++;
-            i++;
+            // i++;
         }
         else {  // otherwise, then add in element to argv
             argv[k] = w_sym[i]; 
@@ -360,10 +360,10 @@ int built_in(char *argv[512]) {
     }
     else if (strcmp(argv[0], "ln") ==0) { // if the command is ln
         if (argv[1] == NULL)  {
-            fprintf(stderr, "error: no source");
+            fprintf(stderr, "ln: syntax error");
         }
         else if (argv[2] == NULL) {
-            fprintf(stderr, "error: no output");
+            fprintf(stderr, "ln: syntax error");
         }
         else if (link(argv[1], argv[2]) != 0) { // error checking
             perror("error: failed to link");
@@ -373,7 +373,7 @@ int built_in(char *argv[512]) {
     }
     else if (strcmp(argv[0], "rm") ==0) { // if the command is rm
         if (argv[1] == NULL)  {
-            fprintf(stderr, "error: no source");
+            fprintf(stderr, "rm: syntax error");
         }
         else if (unlink(argv[1]) != 0) {
             perror("error: unable to delete the file");
