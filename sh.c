@@ -15,6 +15,7 @@ int ln(char *src, char *dest);
 int rm(char *file);
 int file_redirect(const char** input_file, const char** output_file, int* output_flags);
 int set_path(char *tokens[512], char** path);
+
 // close stdin
 // open given file
 // if no input/output file
@@ -84,10 +85,7 @@ int main() {
     if (parse_result == 0) {
         continue;
     }
-    int built_ins = built_in(argv);
-    // if (built_ins == -1) {
-    //     return 1;
-    // } 
+    int built_ins = built_in(argv); 
     if (built_ins == 0) {
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
@@ -201,19 +199,13 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
                 return 0;
             }
             // after error checking is complete
-            // input_index = i;
             *input_file = tokens[i+1];
             i+=2;
-            // argv[k] = w_sym[i];
-            // k++;
-            // i++;
-            // cd /usr/bin/something 
-            // get stuff after forward slash
         }
         else if (strcmp(tokens[i],">") == 0) { 
             // error check first
             flag2++; // set flag to 1- meaning that it was found
-            *output_flags = 2; // O_TRUNC
+            *output_flags = 1; // O_TRUNC
             if (flag2 >1) { // if output redirect appeared 2x
             fprintf(stderr, "Can’t have two output redirects on one line.");
             return 0;
@@ -223,12 +215,8 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             return 0;
             }
             // after error checking is complete
-            // output_index = i;
             *output_file = tokens[i+1];
             i+=2;
-            // argv[k] = w_sym[i];
-            // k++;
-            // i++;
         }
         else if (strcmp(tokens[i],">>") == 0) {
             // error check first
@@ -243,12 +231,8 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             return 0;
             }
             // after error checking is complete
-            // output_index = i;
             *output_file = tokens[i+1];
             i+=2;
-            // argv[k] = w_sym[i];
-            // k++;
-            // i++;
         }
         else {  // otherwise, then add in element to argv
             argv[k] = w_sym[i]; 
@@ -262,24 +246,6 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
     else  {
         set_path(tokens, path);
     }
-// check whether you have mult of teh same input/output redirection
-
-
-    // go through tokens array and redirectit
-    // tokens has echo hello > output.txt test
-    // record the symbol is ther so we know that something occured there (get index of symbol so we know wehre it is)
-    // argv array and ignore the redirect
-    // have 3 variables representing input/output append indices
-    // if index exists then update it
-    //-1 -7
-    // if token at index i == redirect, then do output index = i
-    // just want to record where in token array they appear
-    // once we have them, only include indices that aren't redirects
-    // token after redirect is filename we want to redirect to- dont include that
-    // do for each input/output index
-    // in order to get indices of wherr tokens are >> use strcmp , but not when making argv array
-
-
     return 1;
 }
 
@@ -297,12 +263,6 @@ int file_redirect(const char** input_file, const char** output_file, int* output
             perror("error: open");
             return -1;
         }
-        // ssize_t read_descr = read(open_descr, buffer, 1024);
-        // if (read_descr == -1) {
-        //     perror("error: read");
-        //     return -1;
-        // }
-        // what do i do after I call read?
     }
     if ((*output_file != NULL) && (*output_flags == 1)) { // if there is an output file to truncate
         int closed = close(STDOUT_FILENO);
@@ -311,18 +271,10 @@ int file_redirect(const char** input_file, const char** output_file, int* output
         return -1;
         } 
         int open_descr = open(*output_file, O_CREAT|O_WRONLY|O_TRUNC, 0644); // open file to read
-        // is the mode correct
         if (open_descr == -1) {
             perror("error: open");
             return -1;
         }
-        // ssize_t write_descr = write(open_descr, buffer, 1024); 
-        // // close stdin
-        // // next file has same #
-        // if (write_descr == -1) {
-        //     perror("error: read");
-        //     return -1;
-        // }
     }
     if ((*output_file != NULL) && (*output_flags == 2)) { // if there is an output file to append
         int closed = close(STDOUT_FILENO);
@@ -335,11 +287,6 @@ int file_redirect(const char** input_file, const char** output_file, int* output
             perror("error: open");
             return -1;
         }
-        // ssize_t write_descr = write(open_descr, buffer, 1024);
-        // if (write_descr == -1) {
-        //     perror("error: read");
-        //     return -1;
-        // }
     }
     return 0;
 }
