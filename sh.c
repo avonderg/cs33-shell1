@@ -183,7 +183,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             // error check first
             flag1++; // set flag to 1- meaning that it was found
             if (flag1 >1) { // if input redirect appeared 2x
-                fprintf(stderr, "Can’t have two input redirects on one line.");
+                fprintf(stderr, "syntax error: multiple input files");
                 return 0; 
             }
             if (tokens[i+1] == NULL) {
@@ -207,7 +207,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             flag2++; // set flag to 1- meaning that it was found
             *output_flags = 1; // O_TRUNC
             if (flag2 >1) { // if output redirect appeared 2x
-            fprintf(stderr, "Can’t have two output redirects on one line.");
+            fprintf(stderr, "syntax error: multiple output files");
             return 0;
             }
             if (tokens[i+1] == NULL) {
@@ -223,7 +223,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             flag2++; // set flag to 1- meaning that it was found
             *output_flags = 2; // O_APPEND
             if (flag2 >1) { // if output redirect appeared 2x
-            fprintf(stderr, "Can’t have two output redirects on one line.");
+            fprintf(stderr, "syntax error: multiple output files");
             return 0;
             }
             if (tokens[i+1] == NULL) {
