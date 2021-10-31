@@ -157,8 +157,10 @@ int set_path(char *tokens[512], char** path) {
     int i = 0;
     while (tokens[i] != NULL) {
         if ((strcmp(tokens[i],"<") != 0) && (strcmp(tokens[i],">") != 0) && (strcmp(tokens[i],">>") != 0)) {
+            if ((strcmp(tokens[i],"cd") != 0) && (strcmp(tokens[i],"ln") != 0) && (strcmp(tokens[i],"rm") != 0) && (strcmp(tokens[i],"exit") != 0)) {
             *path = tokens[i];
             return 0;
+            }
         }
         else { // if the current index is a symbol
             i++; // skip over an index (the file)
