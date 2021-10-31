@@ -206,7 +206,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             i+=2;
             argv[k] = w_sym[i];
             k++;
-            // i++;
+            i++;
             // cd /usr/bin/something 
             // get stuff after forward slash
         }
@@ -228,7 +228,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             i+=2;
             argv[k] = w_sym[i];
             k++;
-            // i++;
+            i++;
         }
         else if (strcmp(tokens[i],">>") == 0) {
             // error check first
@@ -248,7 +248,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             i+=2;
             argv[k] = w_sym[i];
             k++;
-            // i++;
+            i++;
         }
         else {  // otherwise, then add in element to argv
             argv[k] = w_sym[i]; 
