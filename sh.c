@@ -204,7 +204,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             // input_index = i;
             *input_file = tokens[i+1];
             i+=2;
-            argv[k] = w_sym[i+2];
+            argv[k] = w_sym[i];
             k++;
             // cd /usr/bin/something 
             // get stuff after forward slash
