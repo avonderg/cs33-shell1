@@ -352,6 +352,7 @@ int built_in(char *argv[512]) {
         }
         if (argv[2] != NULL) { // if there are too many arguments
             fprintf(stderr, "too many arguments");
+            return -1;
         }
         else if (chdir(argv[1]) == -1) {
             perror(argv[0]);
