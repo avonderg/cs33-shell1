@@ -157,10 +157,8 @@ int set_path(char *tokens[512], char** path) {
     int i = 0;
     while (tokens[i] != NULL) {
         if ((strcmp(tokens[i],"<") != 0) && (strcmp(tokens[i],">") != 0) && (strcmp(tokens[i],">>") != 0)) {
-            if ((strcmp(tokens[i],"cd") != 0) && (strcmp(tokens[i],"ln") != 0) && (strcmp(tokens[i],"rm") != 0) && (strcmp(tokens[i],"exit") != 0)) {
             *path = tokens[i];
             return 0;
-            }
         }
         else { // if the current index is a symbol
             i++; // skip over an index (the file)
@@ -296,7 +294,7 @@ int file_redirect(const char** input_file, const char** output_file, int* output
 //write descr
 // returns -1 if error, 1 if successful, 0 if none given
 int built_in(char *argv[512], char** path) {
-    if (strcmp(argv[0], "cd") ==0 && (strcmp(*path,argv[0]) != 0)) { // if the command is cd
+    if (strcmp(argv[0], "cd") ==0) { // if the command is cd
         // char *dir = argv[1];
          // pass in elt after 'cd'
         if (argv[1] == NULL) {
@@ -307,7 +305,7 @@ int built_in(char *argv[512], char** path) {
         }
         return 1;
     }
-    else if ((strcmp(argv[0], "ln") ==0) && (strcmp(*path,argv[0]) != 0)) { // if the command is ln
+    else if (strcmp(argv[0], "ln") ==0) { // if the command is ln
         if (argv[1] == NULL)  {
             fprintf(stderr, "ln: syntax error");
         }
@@ -320,7 +318,7 @@ int built_in(char *argv[512], char** path) {
         }
         return 1;
     }
-    else if (strcmp(argv[0], "rm") ==0 && (strcmp(*path,argv[0]) != 0)) { // if the command is rm
+    else if (strcmp(argv[0], "rm") ==0) { // if the command is rm
         if (argv[1] == NULL)  {
             fprintf(stderr, "rm: syntax error");
         }
