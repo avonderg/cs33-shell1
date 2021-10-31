@@ -85,7 +85,7 @@ int main() {
     if (parse_result == 0) {
         continue;
     }
-    int built_ins = built_in(argv); 
+    int built_ins = built_in(argv, &path); 
     if (built_ins == 0) {
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
