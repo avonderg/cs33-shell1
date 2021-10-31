@@ -200,7 +200,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             // input_index = i;
             *input_file = tokens[i+1];
             argv[k] = w_sym[i+2];
-            i++;
+            i+=2;
             k++;
             // cd /usr/bin/something 
             // get stuff after forward slash
@@ -221,7 +221,7 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             // output_index = i;
             *output_file = tokens[i+1];
             argv[k] = w_sym[i+2];
-            i++;
+            i+=2;
             k++;
         }
         else if (strcmp(tokens[i],">>") == 0) {
@@ -240,14 +240,14 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
             // output_index = i;
             *output_file = tokens[i+1];
             argv[k] = w_sym[i+2];
-            i++;
+            i+=2;
             k++;
         }
         else {  // otherwise, then add in element to argv
             argv[k] = w_sym[i]; 
             k++;
+            i++;
         }
-        i++;
     }
     if (flag1 != 1 && flag2 != 1) {
         *path = tokens[0];
