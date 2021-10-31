@@ -365,6 +365,9 @@ int built_in(char *argv[512]) {
         else if (argv[2] == NULL) {
             fprintf(stderr, "error: no output");
         }
+        else if (argv[3] != NULL) {
+            fprintf(stderr, "error: too many arguments");
+        }
         else if (link(argv[1], argv[2]) != 0) { // error checking
             perror("error: failed to link");
             return -1;
@@ -374,6 +377,9 @@ int built_in(char *argv[512]) {
     else if (strcmp(argv[0], "rm") ==0) { // if the command is rm
         if (argv[1] == NULL)  {
             fprintf(stderr, "error: no source");
+        }
+        else if (argv[2] != NULL) {
+            fprintf(stderr, "error: too many arguments");
         }
         else if (unlink(argv[1]) != 0) {
             perror("error: unable to delete the file");
