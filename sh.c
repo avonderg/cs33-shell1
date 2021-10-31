@@ -85,6 +85,7 @@ int main() {
     if (parse_result == 0) {
         continue;
     }
+    if ((strstr(path,argv[0]) == NULL)) { // if the built-in command is not included in the filepath
     int built_ins = built_in(argv); 
     if (built_ins == 0) {
     pid_t pid;
@@ -105,6 +106,7 @@ int main() {
     else { // if an error has ocurred
         perror("error calling function fork()");
         exit(0);
+    }
     }
     }
     }
