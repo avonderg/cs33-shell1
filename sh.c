@@ -48,6 +48,7 @@ int main() {
 
     // initializing
     char buf[1024];
+    memset(buf, '\0', 1024); // 512 * size of char pointer
     int fd = STDIN_FILENO;
     size_t count = 1024;
     ssize_t to_read;
@@ -67,6 +68,9 @@ int main() {
     char *tokens[512];
     char *argv[512];
     char *w_sym[512];
+    memset(tokens, '\0', 4096); // 512 * size of char pointer
+    memset(argv, '\0', 4096); // 512 * size of char pointer
+    memset(w_sym, '\0', 4096); // 512 * size of char pointer
     char *path = NULL;
     const char *input_file = NULL;
     const char *output_file = NULL;
