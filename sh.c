@@ -9,7 +9,7 @@
 // function declarations
 void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]);
 int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], const char** input_file, const char** output_file, int* output_flags, char** path);
-int built_in(char *argv[512]);
+int built_in(char *argv[512], char** path);
 int cd(char *dir);
 int ln(char *src, char *dest);
 int rm(char *file);
@@ -85,8 +85,7 @@ int main() {
     if (parse_result == 0) {
         continue;
     }
-    if ((strstr(path,argv[0]) == NULL)) { // if the built-in command is not included in the filepath
-    int built_ins = built_in(argv); 
+    int built_ins = built_in(argv, &path); 
     if (built_ins == 0) {
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
@@ -106,7 +105,6 @@ int main() {
     else { // if an error has ocurred
         perror("error calling function fork()");
         exit(0);
-    }
     }
     }
     }
@@ -295,8 +293,8 @@ int file_redirect(const char** input_file, const char** output_file, int* output
 
 //write descr
 // returns -1 if error, 1 if successful, 0 if none given
-int built_in(char *argv[512]) {
-    if (strcmp(argv[0], "cd") ==0) { // if the command is cd
+int built_in(char *argv[512], char** path) {
+    if (strcmp(argv[0], "cd") ==0 && (strcmp(*path,argv[0]) == NULL)) { // if the command is cd
         // char *dir = argv[1];
          // pass in elt after 'cd'
         if (argv[1] == NULL) {
@@ -307,7 +305,7 @@ int built_in(char *argv[512]) {
         }
         return 1;
     }
-    else if (strcmp(argv[0], "ln") ==0) { // if the command is ln
+    else if ((strcmp(argv[0], "ln") ==0) && (strcmp(*path,argv[0]) == NULL)) { // if the command is ln
         if (argv[1] == NULL)  {
             fprintf(stderr, "ln: syntax error");
         }
@@ -320,7 +318,7 @@ int built_in(char *argv[512]) {
         }
         return 1;
     }
-    else if (strcmp(argv[0], "rm") ==0) { // if the command is rm
+    else if (strcmp(argv[0], "rm") ==0 && (strcmp(*path,argv[0]) == NULL)) { // if the command is rm
         if (argv[1] == NULL)  {
             fprintf(stderr, "rm: syntax error");
         }
@@ -330,7 +328,7 @@ int built_in(char *argv[512]) {
         }
         return 1;
     }
-    else if (strcmp(argv[0], "exit") ==0) { // if the command is exit
+    else if (strcmp(argv[0], "exit") ==0 && (strcmp(*path,argv[0]) == NULL)) { // if the command is exit
         exit(0);
     }
     return 0;
