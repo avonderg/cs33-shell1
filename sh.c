@@ -351,8 +351,7 @@ int built_in(char *argv[512]) {
             fprintf(stderr, "error: no directory");
         }
         if (argv[2] != NULL) { // if there are too many arguments
-            fprintf(stderr, "too many arguments");
-            return -1;
+            fprintf(stderr, "");
         }
         else if (chdir(argv[1]) == -1) {
             perror(argv[0]);
