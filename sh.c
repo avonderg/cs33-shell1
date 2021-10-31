@@ -85,9 +85,9 @@ int main() {
         continue;
     }
     int built_ins = built_in(argv);
-    if (built_ins == -1) {
-        return 1;
-    } 
+    // if (built_ins == -1) {
+    //     return 1;
+    // } 
     if (built_ins == 0) {
     pid_t pid;
     if ((pid = fork()) == 0) { // enters child process
