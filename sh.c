@@ -16,6 +16,15 @@ int rm(char *file);
 int file_redirect(const char** input_file, const char** output_file, int* output_flags);
 int set_path(char *tokens[512], char** path);
 
+
+
+/**
+ * Main function
+ * 
+ * Returns:
+ *  - 0 if EOF is reached, 1 if there is an error
+ **/
+
 // close stdin
 // open given file
 // if no input/output file
@@ -43,7 +52,7 @@ int main() {
     }
     if (fflush(stdout) < 0) {
         perror("fflush");
-        return 1; // only return zero when it works!
+        return 1;
     }
     #endif
 
@@ -111,7 +120,17 @@ int main() {
    return 0;
 }
 
-// write descr
+/**
+ * Helper function for parse(), parses an input buffer
+ * 
+ * Parameters:
+ * - buffer: input buffer
+ * - tokens: tokens array to fill with tokenized values
+ * - argv: a pointer to the first element in the command line
+ *            arguments array
+ * - r: an array of characters to remove from tokens
+ * 
+ * **/
 void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[20]) {
     char *temp; // temp string to hold values
     int n = 0;
@@ -151,26 +170,24 @@ void parse_helper(char buffer[1024], char *tokens[512], char *argv[512], char r[
       }
     }
 
-// write descr
-// returns 0 when done
-int set_path(char *tokens[512], char** path) {
-    int i = 0;
-    while (tokens[i] != NULL) {
-        if ((strcmp(tokens[i],"<") != 0) && (strcmp(tokens[i],">") != 0) && (strcmp(tokens[i],">>") != 0)) {
-            *path = tokens[i];
-            return 0;
-        }
-        else { // if the current index is a symbol
-            i++; // skip over an index (the file)
-        }
-    i++;
-    }
-    return 0;
-}
 
-
-// write descr
-// returns 0 if it failed, 1 otherwise
+/**
+ * Parses and tokenizes an input buffer, and fills the argv array appropriately depending on the
+ * existence of file redirection symbols.
+ * 
+ * Parameters:
+ * - buffer: input buffer
+ * - tokens: tokens array to fill with tokenized values
+ * - argv: a pointer to the first element in the command line
+ *            arguments array
+ * - w_sym: temp array to pass in to parse_helper, includes file redirects and filenames
+ * - input_file: a pointer to the input file (if it exists)
+ * - ouptput_file: a pointer to the output file (if it exists)
+ * - path: a pointer to the filepath, to pass in to execv()
+ * 
+ * Returns:
+ * - 0 if an error occured, 1 otherwise
+ * **/
 int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512], const char** input_file, const char** output_file, int* output_flags, char** path) {
     int i = 0; // index for tokens
     int k = 0; // index for argv array
@@ -249,8 +266,46 @@ int parse(char buffer[1024], char *tokens[512], char *argv[512], char *w_sym[512
     return 1;
 }
 
-// write descr
-// returns -1 if an error occured, 0 otherwise
+
+/**
+ * Sets the filepath to be passed in to execv() using the first element in the tokenized array,
+ * provided it is not a file direct or a file.
+ * 
+ * Parameters:
+ * - tokens: tokens array to fill with tokenized values
+ * - path: a pointer to the filepath, to pass in to execv()
+ * 
+ * Returns:
+ * - 0 if path set successfully, 1 otherwise
+ * **/
+int set_path(char *tokens[512], char** path) {
+    int i = 0;
+    while (tokens[i] != NULL) {
+        if ((strcmp(tokens[i],"<") != 0) && (strcmp(tokens[i],">") != 0) && (strcmp(tokens[i],">>") != 0)) {
+            *path = tokens[i];
+            return 0;
+        }
+        else { // if the current index is a symbol
+            i++; // skip over an index (the file)
+        }
+    i++;
+    }
+    return 1;
+}
+
+/**
+ * Handles file redirection by opening the appropriate files based on whether it is an input
+ * file, an output file to append, or an output file to truncate.
+ * 
+ * Parameters:
+ * - input_file: a pointer to the input file (if it exists)
+ * - ouptput_file: a pointer to the output file (if it exists)
+ * - output_flags: an integer pointer representing which type of output file redirection,
+ * if any, is being used. 1 indicates that it must truncate, and 2 indicates it must append
+ * 
+ * Returns:
+ * - -1 if an error occured, 0 otherwise
+ * **/
 int file_redirect(const char** input_file, const char** output_file, int* output_flags) {
     if (*input_file != NULL) { // if there is an input file
     int closed = close(STDIN_FILENO);
@@ -291,8 +346,17 @@ int file_redirect(const char** input_file, const char** output_file, int* output
     return 0;
 }
 
-//write descr
-// returns -1 if error, 1 if successful, 0 if none given
+/**
+ * Handles built_in commands by calling the appropriate system calls
+ * 
+ * Parameters:
+ * - argv: a pointer to the first element in the command line
+ *            arguments array
+ * - path: a pointer to the filepath, to pass in to execv()
+ * 
+ * Returns:
+ * - -1 if an error occured, 1 if successful, and 0 if there was no command foudn
+ * **/
 int built_in(char *argv[512], char **path) {
     if (strcmp(*path, "cd") ==0) { // if the command is cd
         // char *dir = argv[1];
