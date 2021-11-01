@@ -24,24 +24,6 @@ int set_path(char *tokens[512], char** path);
  * Returns:
  *  - 0 if EOF is reached, 1 if there is an error
  **/
-
-// close stdin
-// open given file
-// if no input/output file
-// after that you close stdin
-// open , if its an input, that file using read only
-// need to be able to READ it to allow execv
-// if its a write file (output)
-// depending on which output, set the flags one way
-//o append o trunc
-// set the flags
-// open thouse
-// open files AFTER you run fork
-// between running fork and execv
-// fork into child and open child so child can run commands
-// call parse in the main (parent)
-// in the child is where you read/write
-// execv is going to take in argv array and pointers to input file and output file
 int main() {
     //repl (read eval print loop)
     while (1) {
@@ -294,6 +276,58 @@ int set_path(char *tokens[512], char** path) {
 }
 
 /**
+ * Handles built_in commands by calling the appropriate system calls
+ * 
+ * Parameters:
+ * - argv: a pointer to the first element in the command line
+ *            arguments array
+ * - path: a pointer to the filepath, to pass in to execv()
+ * 
+ * Returns:
+ * - -1 if an error occured, 1 if successful, and 0 if there was no command foudn
+ * **/
+int built_in(char *argv[512], char **path) {
+    if (strcmp(*path, "cd") ==0) { // if the command is cd
+        // char *dir = argv[1];
+         // pass in elt after 'cd'
+        if (argv[1] == NULL) {
+            fprintf(stderr, "cd: syntax error");
+        }
+        else if (chdir(argv[1]) == -1) {
+            perror(argv[0]);
+        }
+        return 1;
+    }
+    else if (strcmp(*path, "ln") ==0) { // if the command is ln
+        if (argv[1] == NULL)  {
+            fprintf(stderr, "ln: syntax error");
+        }
+        else if (argv[2] == NULL) {
+            fprintf(stderr, "ln: syntax error");
+        }
+        else if (link(argv[1], argv[2]) != 0) { // error checking
+            perror("link");
+            return -1;
+        }
+        return 1;
+    }
+    else if (strcmp(*path, "rm") ==0) { // if the command is rm
+        if (argv[1] == NULL)  {
+            fprintf(stderr, "rm: syntax error");
+        }
+        else if (unlink(argv[1]) != 0) {
+            perror("unlink");
+            return -1;
+        }
+        return 1;
+    }
+    else if (strcmp(*path, "exit") ==0) { // if the command is exit
+        exit(0);
+    }
+    return 0;
+}
+
+/**
  * Handles file redirection by opening the appropriate files based on whether it is an input
  * file, an output file to append, or an output file to truncate.
  * 
@@ -342,58 +376,6 @@ int file_redirect(const char** input_file, const char** output_file, int* output
             perror("error: open");
             return -1;
         }
-    }
-    return 0;
-}
-
-/**
- * Handles built_in commands by calling the appropriate system calls
- * 
- * Parameters:
- * - argv: a pointer to the first element in the command line
- *            arguments array
- * - path: a pointer to the filepath, to pass in to execv()
- * 
- * Returns:
- * - -1 if an error occured, 1 if successful, and 0 if there was no command foudn
- * **/
-int built_in(char *argv[512], char **path) {
-    if (strcmp(*path, "cd") ==0) { // if the command is cd
-        // char *dir = argv[1];
-         // pass in elt after 'cd'
-        if (argv[1] == NULL) {
-            fprintf(stderr, "cd: syntax error");
-        }
-        else if (chdir(argv[1]) == -1) {
-            perror(argv[0]);
-        }
-        return 1;
-    }
-    else if (strcmp(*path, "ln") ==0) { // if the command is ln
-        if (argv[1] == NULL)  {
-            fprintf(stderr, "ln: syntax error");
-        }
-        else if (argv[2] == NULL) {
-            fprintf(stderr, "ln: syntax error");
-        }
-        else if (link(argv[1], argv[2]) != 0) { // error checking
-            perror("link");
-            return -1;
-        }
-        return 1;
-    }
-    else if (strcmp(*path, "rm") ==0) { // if the command is rm
-        if (argv[1] == NULL)  {
-            fprintf(stderr, "rm: syntax error");
-        }
-        else if (unlink(argv[1]) != 0) {
-            perror("unlink");
-            return -1;
-        }
-        return 1;
-    }
-    else if (strcmp(*path, "exit") ==0) { // if the command is exit
-        exit(0);
     }
     return 0;
 }
